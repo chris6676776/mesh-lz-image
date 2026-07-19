@@ -1,7 +1,7 @@
 use mesh_lz_codec::codec::{compress, decompress};
 
 fn verify_roundtrip(width: u32, height: u32, channels: u8, data: &[u8], block_size: usize) {
-    let compressed = compress(width, height, channels, data, block_size, 100)
+    let compressed = compress(width, height, channels, data, block_size, 100, false, false, false)
         .unwrap_or_else(|e| panic!("Compression failed for size {}x{}x{}: {}", width, height, channels, e));
     let (_dec_width, _dec_height, _dec_channels, decoded) = decompress(&compressed)
         .unwrap_or_else(|e| panic!("Decompression failed for size {}x{}x{}: {}", width, height, channels, e));
@@ -163,11 +163,11 @@ fn test_lossy_roundtrip() {
         }
     }
 
-    let compressed_lossless = compress(width, height, channels, &data, 8, 100).unwrap();
+    let compressed_lossless = compress(width, height, channels, &data, 8, 100, false, false, false).unwrap();
     let (_, _, _, decoded_lossless) = decompress(&compressed_lossless).unwrap();
     assert_eq!(decoded_lossless, data, "Lossless quality 100 must be bit-perfect");
 
-    let compressed_lossy = compress(width, height, channels, &data, 8, 70).unwrap();
+    let compressed_lossy = compress(width, height, channels, &data, 8, 70, false, false, false).unwrap();
     let (_, _, _, decoded_lossy) = decompress(&compressed_lossy).unwrap();
 
     let mut sum_sq_diff = 0.0;
@@ -255,4 +255,87 @@ fn test_dpcm_all_pairs() {
             assert_eq!(orig, recon, "DPCM round-trip failed: orig={}, prev={}", orig, prev);
         }
     }
+}
+
+#[test]
+fn test_palette_rgb() {
+    let width = 64;
+    let height = 64;
+    let channels = 3;
+    let size = (width * height * channels as u32) as usize;
+    let mut data = vec![0u8; size];
+    
+    // Create a 256-color image (each 16x16 block has a solid color)
+    for y in 0..height {
+        for x in 0..width {
+            let color_idx = (y / 16) * 4 + (x / 16);
+            let idx = (y * width + x) as usize * 3;
+            data[idx] = (color_idx * 15) as u8;
+            data[idx + 1] = 100;
+            data[idx + 2] = 200 - (color_idx * 10) as u8;
+        }
+    }
+
+    let compressed_pal = compress(width, height, channels, &data, 8, 100, true, false, false).unwrap();
+    let (_, _, _, decoded_pal) = decompress(&compressed_pal).unwrap();
+    
+    assert_eq!(decoded_pal, data, "Palette mode must be bit-perfect for <256 colors");
+}
+
+#[test]
+fn test_ycocg_color_space() {
+    let width = 64;
+    let height = 64;
+    let channels = 3;
+    let mut data = vec![0u8; (width * height * channels) as usize];
+    for y in 0..height {
+        for x in 0..width {
+            let idx = ((y * width + x) * channels) as usize;
+            data[idx] = (x * 4 % 256) as u8;
+            data[idx + 1] = (y * 4 % 256) as u8;
+            data[idx + 2] = ((x + y) * 2 % 256) as u8;
+        }
+    }
+
+    let compressed = compress(width, height, channels as u8, &data, 8, 100, false, true, false).unwrap();
+    let (_, _, _, decoded) = decompress(&compressed).unwrap();
+    
+    let mut sum_sq_diff = 0.0;
+    for i in 0..data.len() {
+        let diff = data[i] as f64 - decoded[i] as f64;
+        sum_sq_diff += diff * diff;
+    }
+    let mse = sum_sq_diff / data.len() as f64;
+    assert!(mse < 50.0, "MSE out of bounds for YCoCg: {}", mse);
+}
+
+#[test]
+fn test_ycocg_subsample_lossy() {
+    let width = 64;
+    let height = 64;
+    let channels = 3;
+    let mut data = vec![0u8; (width * height * channels) as usize];
+    for y in 0..height {
+        for x in 0..width {
+            let idx = ((y * width + x) * channels) as usize;
+            data[idx] = (x * 4 % 256) as u8;
+            data[idx + 1] = (y * 4 % 256) as u8;
+            data[idx + 2] = ((x + y) * 2 % 256) as u8;
+        }
+    }
+
+    let compressed = compress(width, height, channels as u8, &data, 8, 100, false, true, true).unwrap();
+    let (_, _, _, decoded) = decompress(&compressed).unwrap();
+    
+    // Subsampled image shouldn't perfectly match original, but should be the exact same size
+    assert_eq!(decoded.len(), data.len());
+    
+    // Check that it's close enough (lossy)
+    let mut sum_sq_diff = 0.0;
+    for i in 0..data.len() {
+        let diff = data[i] as f64 - decoded[i] as f64;
+        sum_sq_diff += diff * diff;
+    }
+    let mse = sum_sq_diff / data.len() as f64;
+    assert!(mse > 0.0 && mse < 500.0, "MSE out of bounds: {}", mse);
 }

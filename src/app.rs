@@ -5,7 +5,7 @@ use std::fs;
 use std::time::Instant;
 use image::GenericImageView;
 use crate::codec;
-use anyhow::Result;
+
 
 #[derive(PartialEq)]
 enum Tab {
@@ -21,6 +21,9 @@ pub struct MlzApp {
     enc_output_path: Option<PathBuf>,
     enc_block_size: usize,
     enc_quality: u8,
+    enc_palette: bool,
+    enc_ycocg: bool,
+    enc_subsample: bool,
     enc_status: String,
     
     // Viewer State
@@ -38,6 +41,9 @@ impl Default for MlzApp {
             enc_output_path: None,
             enc_block_size: 8,
             enc_quality: 100,
+            enc_palette: false,
+            enc_ycocg: false,
+            enc_subsample: false,
             enc_status: String::new(),
             view_input_path: None,
             view_texture: None,
@@ -88,11 +94,35 @@ impl MlzApp {
         ui.radio_value(&mut self.enc_block_size, 16, "16x16");
         
         ui.add_space(10.0);
-        ui.add(egui::Slider::new(&mut self.enc_quality, 1..=100).text("Quality (100 = Lossless)"));
+        ui.add_enabled(!self.enc_palette, egui::Slider::new(&mut self.enc_quality, 1..=100).text("Quality (100 = Lossless)"));
+
+        ui.add_space(10.0);
+        if ui.checkbox(&mut self.enc_palette, "Use 256-color palette (NeuQuant) for lossless RGB").changed() {
+            if self.enc_palette {
+                self.enc_ycocg = false;
+                self.enc_subsample = false;
+            }
+        }
+
+        ui.add_space(5.0);
+        let ycocg_btn = egui::Checkbox::new(&mut self.enc_ycocg, "Use YCoCg-R color space (better for RGB)");
+        if ui.add_enabled(!self.enc_palette, ycocg_btn).changed() {
+            if !self.enc_ycocg {
+                self.enc_subsample = false;
+            }
+        }
+        
+        ui.add_space(5.0);
+        let sub_btn = egui::Checkbox::new(&mut self.enc_subsample, "Use 4:2:0 Chroma Subsampling (requires YCoCg-R, lossy)");
+        if ui.add_enabled(!self.enc_palette, sub_btn).changed() {
+            if self.enc_subsample {
+                self.enc_ycocg = true;
+            }
+        }
 
         ui.add_space(20.0);
         if ui.button("Compress & Save").clicked() {
-            if let Some(input_path) = &self.enc_input_path {
+            if let Some(_input_path) = &self.enc_input_path {
                 if let Some(output_path) = rfd::FileDialog::new()
                     .add_filter("MLZ File", &["mlz"])
                     .save_file() 
@@ -135,7 +165,7 @@ impl MlzApp {
         };
 
         let start = Instant::now();
-        match codec::compress(width, height, channels, &raw_data, self.enc_block_size, self.enc_quality) {
+        match codec::compress(width, height, channels, &raw_data, self.enc_block_size, self.enc_quality, self.enc_palette, self.enc_ycocg, self.enc_subsample) {
             Ok(compressed_bytes) => {
                 let duration = start.elapsed();
                 let orig_size = raw_data.len();

@@ -458,6 +458,18 @@
                 <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;" id="mode-hint">
                     Lossless (Exact bitstream)
                 </div>
+                <div style="margin-top: 8px; display: flex; align-items: center; gap: 8px;">
+                    <input type="checkbox" id="palette-checkbox">
+                    <label for="palette-checkbox" style="text-transform: none; letter-spacing: normal;">Use 256-color palette (NeuQuant) for lossless RGB</label>
+                </div>
+                <div style="margin-top: 8px; display: flex; align-items: center; gap: 8px;">
+                    <input type="checkbox" id="ycocg-checkbox">
+                    <label for="ycocg-checkbox" style="text-transform: none; letter-spacing: normal;">Use YCoCg-R color space (better for RGB)</label>
+                </div>
+                <div style="margin-top: 8px; display: flex; align-items: center; gap: 8px;">
+                    <input type="checkbox" id="subsample-checkbox">
+                    <label for="subsample-checkbox" style="text-transform: none; letter-spacing: normal;">Use 4:2:0 Chroma Subsampling (requires YCoCg-R, lossy)</label>
+                </div>
             </div>
 
             <div class="control-group">
@@ -563,6 +575,49 @@
                 modeHint.textContent = `Lossy (Quality: ${val}%)`;
             }
         });
+        qualitySlider.addEventListener('change', () => {
+            if (loadedFile && !isMlzMode) processBtn.click();
+        });
+
+        // Handle checkbox changes and dependencies
+        const paletteCheck = document.getElementById('palette-checkbox');
+        const ycocgCheck = document.getElementById('ycocg-checkbox');
+        const subsampleCheck = document.getElementById('subsample-checkbox');
+
+        function enforceDependencies(sourceId) {
+            if (sourceId === 'palette-checkbox' && paletteCheck.checked) {
+                qualitySlider.disabled = true;
+                // Palette forces YCoCg and Subsampling off
+                ycocgCheck.checked = false;
+                ycocgCheck.disabled = true;
+                subsampleCheck.checked = false;
+                subsampleCheck.disabled = true;
+            } else if (sourceId === 'palette-checkbox' && !paletteCheck.checked) {
+                qualitySlider.disabled = false;
+                ycocgCheck.disabled = false;
+                subsampleCheck.disabled = false;
+            }
+
+            if (sourceId === 'subsample-checkbox' && subsampleCheck.checked) {
+                ycocgCheck.checked = true;
+            }
+            if (sourceId === 'ycocg-checkbox' && !ycocgCheck.checked) {
+                subsampleCheck.checked = false;
+            }
+        }
+
+        ['palette-checkbox', 'ycocg-checkbox', 'subsample-checkbox'].forEach(id => {
+            const checkbox = document.getElementById(id);
+            if (checkbox) {
+                checkbox.addEventListener('change', (e) => {
+                    enforceDependencies(e.target.id);
+                    if (loadedFile && !isMlzMode) processBtn.click();
+                });
+            }
+        });
+
+        // Run initially to set correct state
+        if (paletteCheck) enforceDependencies('palette-checkbox');
 
         // Block size selection buttons
         document.querySelectorAll('.select-btn').forEach(btn => {
@@ -570,6 +625,7 @@
                 document.querySelectorAll('.select-btn').forEach(b => b.classList.remove('active'));
                 e.target.classList.add('active');
                 blockSelection = parseInt(e.target.getAttribute('data-val'));
+                if (loadedFile && !isMlzMode) processBtn.click();
             });
         });
 
@@ -656,7 +712,10 @@
 
         async function runCompression() {
             const quality = qualitySlider.value;
-            const url = `/api/compress?quality=${quality}&block_size=${blockSelection}`;
+            const usePalette = document.getElementById('palette-checkbox').checked;
+            const useYcocg = document.getElementById('ycocg-checkbox').checked;
+            const subsample = document.getElementById('subsample-checkbox').checked;
+            const url = `/api/compress?quality=${quality}&block_size=${blockSelection}&palette=${usePalette}&ycocg=${useYcocg}&subsample=${subsample}`;
             
             // Upload original image as binary body
             const response = await fetch(url, {

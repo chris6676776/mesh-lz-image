@@ -36,6 +36,18 @@ enum Commands {
         /// Quality of compression (1-100, where 100 is lossless)
         #[arg(short, long, default_value_t = 100)]
         quality: u8,
+        
+        /// Use a 256-color palette (NeuQuant) to compress RGB images further losslessly.
+        #[arg(short, long, default_value_t = false)]
+        palette: bool,
+
+        /// Use YCoCg-R color space for better decorrelation (RGB only).
+        #[arg(short = 'y', long, default_value_t = false)]
+        ycocg: bool,
+
+        /// Use 4:2:0 chroma subsampling for higher compression (requires ycocg).
+        #[arg(short = 's', long, default_value_t = false)]
+        subsample: bool,
     },
 
     /// Decompress a .mlz file back to a standard image.
@@ -61,12 +73,19 @@ fn main() -> Result<()> {
     let cli = Cli::parse();
 
     match cli.command {
-        Some(Commands::Compress { input, output, block_size, quality }) => {
+        Some(Commands::Compress { input, output, block_size, quality, palette, ycocg, subsample }) => {
             if block_size != 8 && block_size != 16 {
                 return Err(anyhow!("Block size must be either 8 or 16"));
             }
             if quality < 1 || quality > 100 {
                 return Err(anyhow!("Quality must be between 1 and 100"));
+            }
+
+            if subsample && !ycocg {
+                return Err(anyhow!("--subsample requires --ycocg to be enabled"));
+            }
+            if palette && (ycocg || subsample) {
+                return Err(anyhow!("--palette cannot be used together with --ycocg or --subsample"));
             }
 
             println!("Loading input image: {:?}", input);
@@ -90,12 +109,12 @@ fn main() -> Result<()> {
             let color_mode_str = if channels == 1 { "Grayscale" } else { "RGB" };
             let quality_str = if quality >= 100 { "Lossless".to_string() } else { format!("Lossy ({}%)", quality) };
             println!(
-                "Compressing image ({}x{}, color: {}, block size: {}, quality: {})...",
-                width, height, color_mode_str, block_size, quality_str
+                "Compressing image ({}x{}, color: {}, block size: {}, quality: {}, palette: {})...",
+                width, height, color_mode_str, block_size, quality_str, palette
             );
 
             let comp_start = Instant::now();
-            let compressed_bytes = codec::compress(width, height, channels, &raw_data, block_size, quality)?;
+            let compressed_bytes = codec::compress(width, height, channels, &raw_data, block_size, quality, palette, ycocg, subsample)?;
             let comp_duration = comp_start.elapsed();
 
             let orig_size = raw_data.len();

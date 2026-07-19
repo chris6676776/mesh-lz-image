@@ -19,9 +19,11 @@ pub fn start_server(port: u16) -> Result<()> {
     for stream in listener.incoming() {
         match stream {
             Ok(stream) => {
-                if let Err(e) = handle_connection(stream) {
-                    eprintln!("Error handling connection: {:?}", e);
-                }
+                std::thread::spawn(move || {
+                    if let Err(e) = handle_connection(stream) {
+                        eprintln!("Error handling connection: {:?}", e);
+                    }
+                });
             }
             Err(e) => eprintln!("Connection failed: {:?}", e),
         }
@@ -83,6 +85,9 @@ fn respond(mut stream: TcpStream, request_line: &str, body: &[u8]) -> Result<()>
     if request_line.starts_with("POST /api/compress") {
         let mut quality = 85;
         let mut block_size = 8;
+        let mut use_palette = false;
+        let mut use_ycocg = false;
+        let mut subsample = false;
         
         if let Some(pos) = request_line.find('?') {
             let query_str = request_line[pos..].split_whitespace().next().unwrap_or("");
@@ -93,6 +98,12 @@ fn respond(mut stream: TcpStream, request_line: &str, body: &[u8]) -> Result<()>
                         quality = val.parse::<u8>().unwrap_or(85);
                     } else if key == "block_size" {
                         block_size = val.parse::<usize>().unwrap_or(8);
+                    } else if key == "palette" {
+                        use_palette = val == "true";
+                    } else if key == "ycocg" {
+                        use_ycocg = val == "true";
+                    } else if key == "subsample" {
+                        subsample = val == "true";
                     }
                 }
             }
@@ -114,7 +125,7 @@ fn respond(mut stream: TcpStream, request_line: &str, body: &[u8]) -> Result<()>
         };
 
         // 2. Compress to MLZC
-        let compressed_bytes = crate::codec::compress(width, height, channels, &raw_data, block_size, quality)?;
+        let compressed_bytes = crate::codec::compress(width, height, channels, &raw_data, block_size, quality, use_palette, use_ycocg, subsample)?;
 
         // 3. Decompress back to verify and generate visual preview
         let (_, _, _, recon_data) = crate::codec::decompress(&compressed_bytes)?;
@@ -191,14 +202,23 @@ fn respond(mut stream: TcpStream, request_line: &str, body: &[u8]) -> Result<()>
         );
         stream.write_all(response.as_bytes())?;
     } else {
-        // Default serve UI dashboard
-        let html = include_str!("viewer.html");
-        let response = format!(
-            "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{}",
-            html.len(),
-            html
-        );
-        stream.write_all(response.as_bytes())?;
+        let path = request_line.split_whitespace().nth(1).unwrap_or("/");
+        if path == "/" || path == "/index.html" {
+            let html = include_str!("viewer.html");
+            let response = format!(
+                "HTTP/1.1 200 OK\r\n\
+                 Content-Type: text/html\r\n\
+                 Cache-Control: no-cache, no-store, must-revalidate\r\n\
+                 Connection: close\r\n\
+                 Content-Length: {}\r\n\r\n{}",
+                html.len(),
+                html
+            );
+            stream.write_all(response.as_bytes())?;
+        } else {
+            let response = "HTTP/1.1 404 Not Found\r\nConnection: close\r\nContent-Length: 0\r\n\r\n";
+            let _ = stream.write_all(response.as_bytes());
+        }
     }
     Ok(())
 }
