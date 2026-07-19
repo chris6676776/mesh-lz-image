@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MLZC Image Format Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-base: #0a0a0c;
+            --bg-surface: rgba(22, 22, 28, 0.45);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --accent-primary: #6366f1;
+            --accent-glow: rgba(99, 102, 241, 0.15);
+            --accent-hover: #4f46e5;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+            --success: #10b981;
+            --success-glow: rgba(16, 185, 129, 0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(99, 102, 241, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 80% 80%, rgba(16, 185, 129, 0.04) 0%, transparent 40%);
+        }
+
+        header {
+            padding: 24px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            background: rgba(10, 10, 12, 0.8);
+            backdrop-filter: blur(12px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-family: 'Outfit', sans-serif;
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #a5b4fc 0%, var(--accent-primary) 50%, #818cf8 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-tag {
+            font-size: 11px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            background: var(--success-glow);
+            color: var(--success);
+            padding: 2px 8px;
+            border-radius: 12px;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        main {
+            flex: 1;
+            padding: 40px;
+            max-width: 1600px;
+            width: 100%;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 380px 1fr;
+            gap: 40px;
+        }
+
+        /* Glassmorphic card base */
+        .panel {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            backdrop-filter: blur(16px);
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        }
+
+        .section-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Drag & Drop */
+        .dropzone {
+            border: 2px dashed rgba(255, 255, 255, 0.15);
+            border-radius: 16px;
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            background: rgba(255, 255, 255, 0.01);
+        }
+
+        .dropzone:hover, .dropzone.dragover {
+            border-color: var(--accent-primary);
+            background: var(--accent-glow);
+            box-shadow: 0 0 20px var(--accent-glow);
+        }
+
+        .dropzone svg {
+            width: 48px;
+            height: 48px;
+            color: var(--text-muted);
+            transition: transform 0.3s ease;
+        }
+
+        .dropzone:hover svg {
+            transform: translateY(-4px);
+            color: var(--accent-primary);
+        }
+
+        .dropzone-title {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .dropzone-desc {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        /* Control inputs */
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        label {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+        }
+
+        .range-slider-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        input[type="range"] {
+            flex: 1;
+            accent-color: var(--accent-primary);
+            height: 6px;
+            border-radius: 3px;
+            background: rgba(255, 255, 255, 0.1);
+            outline: none;
+        }
+
+        .slider-value {
+            font-size: 14px;
+            font-weight: 600;
+            min-width: 36px;
+            text-align: right;
+        }
+
+        .select-button-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .select-btn {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 12px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .select-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .select-btn.active {
+            background: var(--accent-primary);
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 12px rgba(99, 102, 241, 0.4);
+        }
+
+        .action-btn {
+            background: var(--accent-primary);
+            border: none;
+            color: #fff;
+            padding: 16px;
+            border-radius: 14px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 14px 0 rgba(99, 102, 241, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .action-btn:hover {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px 0 rgba(99, 102, 241, 0.6);
+        }
+
+        .action-btn:disabled {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text-muted);
+            box-shadow: none;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .action-btn.success {
+            background: var(--success);
+            box-shadow: 0 4px 14px 0 rgba(16, 185, 129, 0.4);
+        }
+
+        .action-btn.success:hover {
+            background: #059669;
+            box-shadow: 0 6px 20px 0 rgba(16, 185, 129, 0.6);
+        }
+
+        /* Main Workspace layout */
+        .workspace {
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+
+        .stat-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+        }
+
+        .stat-value {
+            font-family: 'Outfit', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .viewer-container {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            min-height: 500px;
+        }
+
+        .viewer-box {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .viewer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .viewer-title {
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+        }
+
+        .viewer-badge {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+            border: 1px solid var(--border-color);
+        }
+
+        .canvas-wrapper {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #060608;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+            position: relative;
+            min-height: 400px;
+            overflow: auto;
+        }
+
+        .canvas-wrapper img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            image-rendering: pixelated;
+        }
+
+        .empty-placeholder {
+            color: var(--text-muted);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .empty-placeholder svg {
+            width: 48px;
+            height: 48px;
+            opacity: 0.4;
+        }
+
+        /* Loading indicator overlay */
+        .loader-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(10, 10, 12, 0.85);
+            backdrop-filter: blur(8px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            z-index: 10;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            border-radius: 24px;
+        }
+
+        .loader-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top-color: var(--accent-primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Hidden inputs */
+        #file-input {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            MLZC CODEC
+            <span class="logo-tag">Lossy & Lossless</span>
+        </div>
+        <div style="font-size: 13px; color: var(--text-muted); font-weight: 500;">
+            Local Server Running on Port 8080
+        </div>
+    </header>
+
+    <main>
+        <!-- Left Panel Controls -->
+        <div class="panel">
+            <div class="section-title">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                Load Payload / Image
+            </div>
+            
+            <div class="dropzone" id="dropzone">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                <div class="dropzone-title" id="dropzone-text">Drag & drop image or .mlz payload</div>
+                <div class="dropzone-desc">Supports PNG, JPG, BMP, or MLZ files</div>
+                <input type="file" id="file-input" accept=".png,.jpg,.jpeg,.bmp,.mlz">
+            </div>
+
+            <div class="control-group">
+                <label>Compression Mode</label>
+                <div class="range-slider-wrapper">
+                    <input type="range" id="quality-slider" min="5" max="100" value="100">
+                    <div class="slider-value" id="quality-val">100%</div>
+                </div>
+                <div style="font-size: 11px; color: var(--text-muted); margin-top: 2px;" id="mode-hint">
+                    Lossless (Exact bitstream)
+                </div>
+            </div>
+
+            <div class="control-group">
+                <label>Block Size</label>
+                <div class="select-button-group">
+                    <button class="select-btn active" data-val="8">8x8 blocks</button>
+                    <button class="select-btn" data-val="16">16x16 blocks</button>
+                </div>
+            </div>
+
+            <button class="action-btn" id="process-btn" disabled>
+                Compress to MLZC
+            </button>
+
+            <button class="action-btn success" id="download-btn" style="display: none;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                Download .mlz Binary
+            </button>
+        </div>
+
+        <!-- Main Workspace -->
+        <div class="workspace">
+            <!-- Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Original Size</div>
+                    <div class="stat-value" id="stat-orig">-</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Compressed Size</div>
+                    <div class="stat-value" id="stat-comp">-</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Ratio</div>
+                    <div class="stat-value" id="stat-ratio" style="color: var(--accent-primary);">-</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Quality (PSNR)</div>
+                    <div class="stat-value" id="stat-psnr">-</div>
+                </div>
+            </div>
+
+            <!-- Double Viewport Container -->
+            <div class="viewer-container">
+                <div class="viewer-box">
+                    <div class="viewer-header">
+                        <div class="viewer-title">Original Reference</div>
+                        <div class="viewer-badge" id="orig-badge">-</div>
+                    </div>
+                    <div class="canvas-wrapper" id="orig-wrapper">
+                        <div class="empty-placeholder">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                            <div>Upload image to start comparison</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="viewer-box">
+                    <div class="loader-overlay" id="recon-loader">
+                        <div class="spinner"></div>
+                        <div style="font-weight: 500; font-size: 14px;">Encoding block mesh...</div>
+                    </div>
+                    <div class="viewer-header">
+                        <div class="viewer-title">MLZC Decompressed View</div>
+                        <div class="viewer-badge" id="recon-badge">-</div>
+                    </div>
+                    <div class="canvas-wrapper" id="recon-wrapper">
+                        <div class="empty-placeholder">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
+                            <div>Compare lossy/lossless outputs here</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const dropzone = document.getElementById('dropzone');
+        const fileInput = document.getElementById('file-input');
+        const qualitySlider = document.getElementById('quality-slider');
+        const qualityVal = document.getElementById('quality-val');
+        const modeHint = document.getElementById('mode-hint');
+        const processBtn = document.getElementById('process-btn');
+        const downloadBtn = document.getElementById('download-btn');
+        const origWrapper = document.getElementById('orig-wrapper');
+        const reconWrapper = document.getElementById('recon-wrapper');
+        const reconLoader = document.getElementById('recon-loader');
+
+        let blockSelection = 8;
+        let loadedFile = null;
+        let isMlzMode = false;
+        let compressedMlzBytes = null;
+        let originalFileName = "";
+
+        // Handle quality changes
+        qualitySlider.addEventListener('input', (e) => {
+            const val = e.target.value;
+            qualityVal.textContent = val + '%';
+            if (val >= 100) {
+                modeHint.textContent = "Lossless (Exact bitstream)";
+            } else {
+                modeHint.textContent = `Lossy (Quality: ${val}%)`;
+            }
+        });
+
+        // Block size selection buttons
+        document.querySelectorAll('.select-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('.select-btn').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                blockSelection = parseInt(e.target.getAttribute('data-val'));
+            });
+        });
+
+        // Trigger file inputs
+        dropzone.addEventListener('click', () => fileInput.click());
+
+        // Drag events
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropzone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                dropzone.classList.add('dragover');
+            }, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropzone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                dropzone.classList.remove('dragover');
+            }, false);
+        });
+
+        dropzone.addEventListener('drop', (e) => {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFile(e.target.files[0]);
+            }
+        });
+
+        function handleFile(file) {
+            loadedFile = file;
+            originalFileName = file.name;
+            const ext = file.name.split('.').pop().toLowerCase();
+            isMlzMode = (ext === 'mlz');
+
+            document.getElementById('dropzone-text').textContent = file.name;
+            processBtn.disabled = false;
+            downloadBtn.style.display = 'none';
+
+            if (isMlzMode) {
+                // Decompression flow
+                processBtn.textContent = "Decompress Payload";
+                qualitySlider.disabled = true;
+                document.querySelectorAll('.select-btn').forEach(b => b.disabled = true);
+            } else {
+                // Compression flow
+                processBtn.textContent = "Compress to MLZC";
+                qualitySlider.disabled = false;
+                document.querySelectorAll('.select-btn').forEach(b => b.disabled = false);
+
+                // Show original preview in Left Box
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    origWrapper.innerHTML = `<img src="${e.target.result}" id="orig-img" />`;
+                    document.getElementById('orig-badge').textContent = `Format: ${ext.toUpperCase()}`;
+                    document.getElementById('stat-orig').textContent = formatBytes(file.size);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        processBtn.addEventListener('click', async () => {
+            if (!loadedFile) return;
+
+            reconLoader.classList.add('active');
+            try {
+                if (isMlzMode) {
+                    await runDecompression();
+                } else {
+                    await runCompression();
+                }
+            } catch (err) {
+                alert("Operation failed: " + err.message);
+            } finally {
+                reconLoader.classList.remove('active');
+            }
+        });
+
+        async function runCompression() {
+            const quality = qualitySlider.value;
+            const url = `/api/compress?quality=${quality}&block_size=${blockSelection}`;
+            
+            // Upload original image as binary body
+            const response = await fetch(url, {
+                method: 'POST',
+                body: loadedFile
+            });
+
+            if (!response.ok) {
+                const text = await response.text();
+                throw new Error(text || "Compression failed");
+            }
+
+            const json = await response.json();
+            
+            // Store compressed bytes base64 to binary
+            const binaryString = window.atob(json.mlz_b64);
+            const bytes = new Uint8Array(binaryString.length);
+            for (let i = 0; i < binaryString.length; i++) {
+                bytes[i] = binaryString.charCodeAt(i);
+            }
+            compressedMlzBytes = bytes;
+
+            // Update previews and badges
+            reconWrapper.innerHTML = `<img src="data:image/png;base64,${json.png_b64}" />`;
+            document.getElementById('recon-badge').textContent = `Block: ${blockSelection}x${blockSelection}`;
+            
+            // Update stats
+            document.getElementById('stat-comp').textContent = formatBytes(json.compressed_size);
+            document.getElementById('stat-ratio').textContent = `${json.ratio.toFixed(2)}x`;
+            
+            const psnrText = json.psnr >= 99.0 ? "Lossless (Infinite)" : `${json.psnr.toFixed(2)} dB`;
+            document.getElementById('stat-psnr').textContent = psnrText;
+
+            downloadBtn.style.display = 'flex';
+        }
+
+        async function runDecompression() {
+            const response = await fetch('/api/decompress', {
+                method: 'POST',
+                body: loadedFile
+            });
+
+            if (!response.ok) {
+                const text = await response.text();
+                throw new Error(text || "Decompression failed");
+            }
+
+            const json = await response.json();
+            
+            // Display decompressed image in Right Viewbox
+            reconWrapper.innerHTML = `<img src="data:image/png;base64,${json.png_b64}" />`;
+            document.getElementById('recon-badge').textContent = `${json.width}x${json.height} (${json.channels === 1 ? 'Luma' : 'RGB'})`;
+
+            // Reset stats since we don't have original image size context
+            document.getElementById('stat-comp').textContent = formatBytes(loadedFile.size);
+            document.getElementById('stat-orig').textContent = "-";
+            document.getElementById('stat-ratio').textContent = "-";
+            document.getElementById('stat-psnr').textContent = "Restored Lossless/Lossy";
+        }
+
+        downloadBtn.addEventListener('click', () => {
+            if (!compressedMlzBytes) return;
+            const blob = new Blob([compressedMlzBytes], { type: 'application/octet-stream' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            const baseName = originalFileName.split('.').slice(0, -1).join('.');
+            link.download = `${baseName}.mlz`;
+            link.click();
+        });
+
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+    </script>
+</body>
+</html>
