@@ -1,1 +1,8 @@
 /target
+
+# Benchmark outputs
+bench_tmp/
+benchmark_rd_curve.png
+benchmark_table.md
+benchmark.py
+requirements-benchmark.txt
