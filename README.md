@@ -15,7 +15,7 @@ cd newform
 Mesh-LZ includes a hardware-accelerated desktop application to visually compress and compare images.
 
 ```bash
-cargo run --release
+cargo run --release --bin mesh_lz_codec
 ```
 
 # Run the CLI
