@@ -65,7 +65,7 @@ The ultimate mode for web compression. Human eyes are less sensitive to color re
 ### Benchmark Data Table
 
 
-| Group | Name | BPP | File Size (Bytes) | SSIM | True Enc (ms) | True Dec (ms) |
+| Group | Name | BPP | File Size (Bytes) | SSIM | Enc (ms) | Dec (ms) |
 |-------|------|-----|-------------------|------|---------------|---------------|
 | Lossless | MLZ 8x8 | 11.704 | 575270 | 1.0000 | 10.15 | 3.70 |
 | Lossless | MLZ 16x16 | 11.514 | 565944 | 1.0000 | 12.07 | 3.64 |
