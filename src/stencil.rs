@@ -1,4 +1,27 @@
-pub fn get_stencil(stencil_idx: u8, b: usize) -> Vec<(usize, usize)> {
+use std::sync::OnceLock;
+
+static STENCILS_8: [OnceLock<Vec<(usize, usize)>>; 8] = [
+    OnceLock::new(), OnceLock::new(), OnceLock::new(), OnceLock::new(),
+    OnceLock::new(), OnceLock::new(), OnceLock::new(), OnceLock::new(),
+];
+
+static STENCILS_16: [OnceLock<Vec<(usize, usize)>>; 8] = [
+    OnceLock::new(), OnceLock::new(), OnceLock::new(), OnceLock::new(),
+    OnceLock::new(), OnceLock::new(), OnceLock::new(), OnceLock::new(),
+];
+
+pub fn get_stencil(stencil_idx: u8, b: usize) -> &'static [(usize, usize)] {
+    let idx = (stencil_idx % 8) as usize;
+    if b == 8 {
+        STENCILS_8[idx].get_or_init(|| generate_stencil(idx as u8, b)).as_slice()
+    } else if b == 16 {
+        STENCILS_16[idx].get_or_init(|| generate_stencil(idx as u8, b)).as_slice()
+    } else {
+        panic!("Unsupported block size for stencil caching: {}", b);
+    }
+}
+
+fn generate_stencil(stencil_idx: u8, b: usize) -> Vec<(usize, usize)> {
     match stencil_idx {
         0 => generate_hilbert(b),
         1 => generate_raster(b),

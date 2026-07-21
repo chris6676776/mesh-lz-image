@@ -173,22 +173,31 @@ pub fn compress(
     }
 
     // 2. Perform stencil selection and generate LZ commands for all blocks
-    let mut stencils = vec![0u8; rows * cols];
-    let mut block_commands = vec![Vec::new(); rows * cols];
+    struct RowData {
+        stencils: Vec<u8>,
+        commands: Vec<Vec<LzCommand>>,
+        count_stencil: [u32; 8],
+        count_command: [u32; 2],
+        count_residual_0: [u32; 256],
+        count_residual_1: [u32; 256],
+        count_residual_2: [u32; 256],
+        count_offset: [u32; 257],
+        count_length: [u32; 257],
+    }
 
-    // Symbol counts for building frequency tables
-    let mut count_stencil = vec![0u32; 8];
-    let mut count_command = vec![0u32; 2];
-    let mut count_residual_0 = vec![0u32; 256];
-    let mut count_residual_1 = vec![0u32; 256];
-    let mut count_residual_2 = vec![0u32; 256];
-    let mut count_offset = vec![0u32; 257];
-    let mut count_length = vec![0u32; 257];
+    let row_data_vec: Vec<RowData> = (0..rows).into_par_iter().map(|by| {
+        let mut stencils = Vec::with_capacity(cols);
+        let mut commands = Vec::with_capacity(cols);
+        
+        let mut count_stencil = [0u32; 8];
+        let mut count_command = [0u32; 2];
+        let mut count_residual_0 = [0u32; 256];
+        let mut count_residual_1 = [0u32; 256];
+        let mut count_residual_2 = [0u32; 256];
+        let mut count_offset = [0u32; 257];
+        let mut count_length = [0u32; 257];
 
-    for by in 0..rows {
         for bx in 0..cols {
-            let block_idx = by * cols + bx;
-
             // Extract BxB block pixels
             let mut block = vec![Pixel { channels: [0, 0, 0], count: eff_channels }; b * b];
             for y in 0..b {
@@ -220,20 +229,19 @@ pub fn compress(
                 0 // Hilbert Curve (default for low/balanced variance)
             };
 
-            stencils[block_idx] = stencil_idx;
+            stencils.push(stencil_idx);
             count_stencil[stencil_idx as usize] += 1;
 
             // Generate 1D path using selected stencil
             let path = stencil::get_stencil(stencil_idx, b);
             let mut path_pixels = Vec::with_capacity(b * b);
-            for &(py, px) in &path {
+            for &(py, px) in path {
                 path_pixels.push(block[py * b + px]);
             }
 
             // Encode block using Mesh-LZ
             let cmds = encode_block_lz(&path_pixels, 3);
-            block_commands[block_idx] = cmds.clone();
-
+            
             // Accumulate counts for FreqTables using closed-loop reconstruction
             let mut prev = Pixel { channels: [0, 0, 0], count: eff_channels };
             let mut coded_count = 0;
@@ -287,6 +295,48 @@ pub fn compress(
                     }
                 }
             }
+            commands.push(cmds);
+        }
+        
+        RowData {
+            stencils,
+            commands,
+            count_stencil,
+            count_command,
+            count_residual_0,
+            count_residual_1,
+            count_residual_2,
+            count_offset,
+            count_length,
+        }
+    }).collect();
+
+    // Merge counts and commands
+    let mut stencils = Vec::with_capacity(rows * cols);
+    let mut block_commands = Vec::with_capacity(rows * cols);
+    
+    let mut count_stencil = vec![0u32; 8];
+    let mut count_command = vec![0u32; 2];
+    let mut count_residual_0 = vec![0u32; 256];
+    let mut count_residual_1 = vec![0u32; 256];
+    let mut count_residual_2 = vec![0u32; 256];
+    let mut count_offset = vec![0u32; 257];
+    let mut count_length = vec![0u32; 257];
+
+    for rd in row_data_vec {
+        stencils.extend(rd.stencils);
+        block_commands.extend(rd.commands);
+        
+        for i in 0..8 { count_stencil[i] += rd.count_stencil[i]; }
+        for i in 0..2 { count_command[i] += rd.count_command[i]; }
+        for i in 0..256 {
+            count_residual_0[i] += rd.count_residual_0[i];
+            count_residual_1[i] += rd.count_residual_1[i];
+            count_residual_2[i] += rd.count_residual_2[i];
+        }
+        for i in 0..257 {
+            count_offset[i] += rd.count_offset[i];
+            count_length[i] += rd.count_length[i];
         }
     }
 
@@ -512,13 +562,13 @@ pub fn decompress(bitstream: &[u8]) -> Result<(u32, u32, u8, Vec<u8>)> {
     let h_pad = rows * b;
     let mut padded_pixels = vec![Pixel { channels: [0, 0, 0], count: eff_channels }; w_pad * h_pad];
 
-    let row_results: Result<Vec<Vec<Pixel>>> = (0..rows)
-        .into_par_iter()
-        .map(|by| {
-            let row_data = row_payloads[by];
+    let row_results: Result<()> = padded_pixels
+        .par_chunks_exact_mut(cols * b * b)
+        .zip(row_payloads)
+        .enumerate()
+        .map(|(by, (row_pixels, row_data))| {
             let mut r_offset = 0;
             let mut decoder = InterleavedDecoder::new(row_data, &mut r_offset)?;
-            let mut row_pixels = vec![Pixel { channels: [0, 0, 0], count: eff_channels }; cols * b * b];
 
             let mut symbol_idx = 0;
             for bx in 0..cols {
@@ -585,27 +635,17 @@ pub fn decompress(bitstream: &[u8]) -> Result<(u32, u32, u8, Vec<u8>)> {
                     }
                 }
 
-                // Place decoded block pixels in row pixel buffer mapped to 2D block coordinates
+                // Place decoded block pixels directly into the padded image buffer
                 for (idx, &(py, px)) in path.iter().enumerate() {
-                    row_pixels[bx * b * b + py * b + px] = block_pixels[idx];
+                    row_pixels[py * w_pad + bx * b + px] = block_pixels[idx];
                 }
             }
 
-            Ok(row_pixels)
+            Ok(())
         })
         .collect();
 
-    let decoded_rows = row_results?;
-    for by in 0..rows {
-        let row_pixels = &decoded_rows[by];
-        for bx in 0..cols {
-            for y in 0..b {
-                for x in 0..b {
-                    padded_pixels[(by * b + y) * w_pad + (bx * b + x)] = row_pixels[bx * b * b + y * b + x];
-                }
-            }
-        }
-    }
+    row_results?;
 
     // 7. Crop the padded image and reconstruct color values
     let mut out_data = vec![0u8; (width * height) as usize * channels as usize];

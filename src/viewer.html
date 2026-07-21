@@ -41,7 +41,7 @@
         }
 
         header {
-            padding: 24px 40px;
+            padding: 20px 40px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -55,7 +55,7 @@
 
         .logo {
             font-family: 'Outfit', sans-serif;
-            font-size: 24px;
+            font-size: 22px;
             font-weight: 800;
             letter-spacing: -0.5px;
             background: linear-gradient(135deg, #a5b4fc 0%, var(--accent-primary) 50%, #818cf8 100%);
@@ -77,35 +77,38 @@
             border: 1px solid rgba(16, 185, 129, 0.2);
             letter-spacing: 0.5px;
             text-transform: uppercase;
+            -webkit-text-fill-color: var(--success);
         }
 
         main {
             flex: 1;
-            padding: 40px;
-            max-width: 1600px;
+            padding: 32px 40px;
+            max-width: 1800px;
             width: 100%;
             margin: 0 auto;
             display: grid;
-            grid-template-columns: 380px 1fr;
-            gap: 40px;
+            grid-template-columns: 360px 1fr;
+            gap: 32px;
         }
 
-        /* Glassmorphic card base */
         .panel {
             background: var(--bg-surface);
             border: 1px solid var(--border-color);
             border-radius: 24px;
             backdrop-filter: blur(16px);
-            padding: 30px;
+            padding: 28px;
             display: flex;
             flex-direction: column;
-            gap: 24px;
+            gap: 22px;
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+            align-self: start;
+            position: sticky;
+            top: 82px;
         }
 
         .section-title {
             font-family: 'Outfit', sans-serif;
-            font-size: 18px;
+            font-size: 17px;
             font-weight: 600;
             color: var(--text-main);
             display: flex;
@@ -113,18 +116,17 @@
             gap: 8px;
         }
 
-        /* Drag & Drop */
         .dropzone {
             border: 2px dashed rgba(255, 255, 255, 0.15);
             border-radius: 16px;
-            padding: 40px 20px;
+            padding: 36px 20px;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s ease;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
             background: rgba(255, 255, 255, 0.01);
         }
 
@@ -135,8 +137,8 @@
         }
 
         .dropzone svg {
-            width: 48px;
-            height: 48px;
+            width: 44px;
+            height: 44px;
             color: var(--text-muted);
             transition: transform 0.3s ease;
         }
@@ -147,7 +149,7 @@
         }
 
         .dropzone-title {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 500;
         }
 
@@ -156,7 +158,6 @@
             color: var(--text-muted);
         }
 
-        /* Control inputs */
         .control-group {
             display: flex;
             flex-direction: column;
@@ -196,17 +197,17 @@
         .select-button-group {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 12px;
+            gap: 10px;
         }
 
         .select-btn {
             background: rgba(255, 255, 255, 0.04);
             border: 1px solid var(--border-color);
             color: var(--text-main);
-            padding: 12px;
-            border-radius: 12px;
+            padding: 10px;
+            border-radius: 10px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 500;
             transition: all 0.2s ease;
         }
@@ -226,9 +227,9 @@
             background: var(--accent-primary);
             border: none;
             color: #fff;
-            padding: 16px;
-            border-radius: 14px;
-            font-size: 15px;
+            padding: 14px;
+            border-radius: 12px;
+            font-size: 14px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -263,27 +264,28 @@
             box-shadow: 0 6px 20px 0 rgba(16, 185, 129, 0.6);
         }
 
-        /* Main Workspace layout */
+        /* ─── Workspace ─── */
         .workspace {
             display: flex;
             flex-direction: column;
-            gap: 32px;
+            gap: 24px;
+            min-width: 0;
         }
 
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
+            gap: 16px;
         }
 
         .stat-card {
             background: var(--bg-surface);
             border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 20px;
+            border-radius: 14px;
+            padding: 18px;
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 5px;
         }
 
         .stat-label {
@@ -296,38 +298,100 @@
 
         .stat-value {
             font-family: 'Outfit', sans-serif;
-            font-size: 20px;
+            font-size: 19px;
             font-weight: 700;
         }
 
-        .viewer-container {
+        /* ─── Zoom/Pan Controls Bar ─── */
+        .zoom-controls {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            backdrop-filter: blur(12px);
+        }
+
+        .zoom-label {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+
+        .zoom-btn {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+
+        .zoom-btn:hover {
+            background: rgba(255, 255, 255, 0.12);
+            border-color: var(--accent-primary);
+        }
+
+        #zoom-display {
+            font-family: 'Outfit', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--accent-primary);
+            min-width: 52px;
+            text-align: center;
+        }
+
+        #zoom-range {
             flex: 1;
+        }
+
+        .zoom-hint {
+            font-size: 11px;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+
+        /* ─── Viewer Container ─── */
+        .viewer-container {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            min-height: 500px;
+            gap: 20px;
+            min-height: 520px;
         }
 
         .viewer-box {
             background: var(--bg-surface);
             border: 1px solid var(--border-color);
-            border-radius: 24px;
-            padding: 24px;
+            border-radius: 20px;
+            padding: 18px;
             display: flex;
             flex-direction: column;
-            gap: 16px;
+            gap: 12px;
             position: relative;
-            overflow: hidden;
         }
 
         .viewer-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-shrink: 0;
         }
 
         .viewer-title {
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -336,55 +400,68 @@
 
         .viewer-badge {
             background: rgba(255, 255, 255, 0.05);
-            padding: 4px 10px;
-            border-radius: 12px;
+            padding: 3px 10px;
+            border-radius: 10px;
             font-size: 11px;
             font-weight: 500;
             border: 1px solid var(--border-color);
         }
 
-        .canvas-wrapper {
+        /* ─── The synchronized canvas viewport ─── */
+        .canvas-viewport {
             flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             background: #060608;
-            border-radius: 16px;
+            border-radius: 12px;
             border: 1px solid rgba(255, 255, 255, 0.03);
+            overflow: hidden;
+            cursor: grab;
             position: relative;
-            min-height: 400px;
-            overflow: auto;
+            min-height: 440px;
+            user-select: none;
         }
 
-        .canvas-wrapper img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
+        .canvas-viewport:active {
+            cursor: grabbing;
+        }
+
+        .canvas-viewport canvas {
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
             image-rendering: pixelated;
+            image-rendering: crisp-edges;
         }
 
+        /* Empty placeholder */
         .empty-placeholder {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             color: var(--text-muted);
             text-align: center;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
+            pointer-events: none;
         }
 
         .empty-placeholder svg {
-            width: 48px;
-            height: 48px;
-            opacity: 0.4;
+            width: 44px;
+            height: 44px;
+            opacity: 0.35;
         }
 
-        /* Loading indicator overlay */
+        .empty-placeholder p {
+            font-size: 13px;
+        }
+
+        /* Loading overlay */
         .loader-overlay {
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
+            inset: 0;
             background: rgba(10, 10, 12, 0.85);
             backdrop-filter: blur(8px);
             display: flex;
@@ -392,11 +469,11 @@
             align-items: center;
             justify-content: center;
             gap: 16px;
-            z-index: 10;
+            z-index: 20;
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.3s ease;
-            border-radius: 24px;
+            border-radius: 20px;
         }
 
         .loader-overlay.active {
@@ -405,8 +482,8 @@
         }
 
         .spinner {
-            width: 40px;
-            height: 40px;
+            width: 36px;
+            height: 36px;
             border: 3px solid rgba(255, 255, 255, 0.1);
             border-top-color: var(--accent-primary);
             border-radius: 50%;
@@ -417,20 +494,33 @@
             to { transform: rotate(360deg); }
         }
 
-        /* Hidden inputs */
-        #file-input {
-            display: none;
+        /* Crosshair cursor coords */
+        .coords-display {
+            position: absolute;
+            bottom: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 11px;
+            color: var(--text-muted);
+            background: rgba(10,10,12,0.7);
+            padding: 2px 8px;
+            border-radius: 6px;
+            pointer-events: none;
+            z-index: 5;
+            backdrop-filter: blur(4px);
         }
+
+        #file-input { display: none; }
     </style>
 </head>
 <body>
     <header>
         <div class="logo">
             MLZC CODEC
-            <span class="logo-tag">Lossy & Lossless</span>
+            <span class="logo-tag">Lossy &amp; Lossless</span>
         </div>
         <div style="font-size: 13px; color: var(--text-muted); font-weight: 500;">
-            Local Server Running on Port 8080
+            Local Server · <span id="port-display">Port 8081</span>
         </div>
     </header>
 
@@ -439,12 +529,12 @@
         <div class="panel">
             <div class="section-title">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
-                Load Payload / Image
+                Load Image / Payload
             </div>
             
             <div class="dropzone" id="dropzone">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
-                <div class="dropzone-title" id="dropzone-text">Drag & drop image or .mlz payload</div>
+                <div class="dropzone-title" id="dropzone-text">Drag &amp; drop image or .mlz payload</div>
                 <div class="dropzone-desc">Supports PNG, JPG, BMP, or MLZ files</div>
                 <input type="file" id="file-input" accept=".png,.jpg,.jpeg,.bmp,.mlz">
             </div>
@@ -475,8 +565,8 @@
             <div class="control-group">
                 <label>Block Size</label>
                 <div class="select-button-group">
-                    <button class="select-btn active" data-val="8">8x8 blocks</button>
-                    <button class="select-btn" data-val="16">16x16 blocks</button>
+                    <button class="select-btn active" data-val="8">8×8 blocks</button>
+                    <button class="select-btn" data-val="16">16×16 blocks</button>
                 </div>
             </div>
 
@@ -485,14 +575,14 @@
             </button>
 
             <button class="action-btn success" id="download-btn" style="display: none;">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
                 Download .mlz Binary
             </button>
         </div>
 
         <!-- Main Workspace -->
         <div class="workspace">
-            <!-- Stats -->
+            <!-- Stats Row -->
             <div class="stats-grid">
                 <div class="stat-card">
                     <div class="stat-label">Original Size</div>
@@ -512,35 +602,57 @@
                 </div>
             </div>
 
-            <!-- Double Viewport Container -->
+            <!-- Zoom/Pan Control Bar -->
+            <div class="zoom-controls">
+                <span class="zoom-label">🔍 Zoom &amp; Pan</span>
+                <button class="zoom-btn" id="zoom-out-btn" title="Zoom Out">−</button>
+                <input type="range" id="zoom-range" min="-3" max="4" step="0.01" value="0">
+                <button class="zoom-btn" id="zoom-in-btn" title="Zoom In">+</button>
+                <span id="zoom-display">100%</span>
+                <button class="zoom-btn" id="zoom-reset-btn" title="Reset View" style="width: auto; padding: 0 10px; font-size:12px;">1:1</button>
+                <button class="zoom-btn" id="zoom-fit-btn" title="Fit to View" style="width: auto; padding: 0 10px; font-size:12px;">Fit</button>
+                <span class="zoom-hint">Scroll wheel · drag to pan</span>
+            </div>
+
+            <!-- Dual Viewer -->
             <div class="viewer-container">
+                <!-- Original -->
                 <div class="viewer-box">
-                    <div class="viewer-header">
-                        <div class="viewer-title">Original Reference</div>
-                        <div class="viewer-badge" id="orig-badge">-</div>
+                    <div class="loader-overlay" id="orig-loader">
+                        <div class="spinner"></div>
+                        <div style="font-weight: 500; font-size: 13px;">Loading…</div>
                     </div>
-                    <div class="canvas-wrapper" id="orig-wrapper">
-                        <div class="empty-placeholder">
+                    <div class="viewer-header">
+                        <div class="viewer-title">⬛ Original Reference</div>
+                        <div class="viewer-badge" id="orig-badge">—</div>
+                    </div>
+                    <div class="canvas-viewport" id="orig-viewport">
+                        <canvas id="orig-canvas"></canvas>
+                        <div class="empty-placeholder" id="orig-empty">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
-                            <div>Upload image to start comparison</div>
+                            <p>Upload image to start comparison</p>
                         </div>
+                        <div class="coords-display" id="orig-coords"></div>
                     </div>
                 </div>
 
+                <!-- MLZ Reconstructed -->
                 <div class="viewer-box">
                     <div class="loader-overlay" id="recon-loader">
                         <div class="spinner"></div>
-                        <div style="font-weight: 500; font-size: 14px;">Encoding block mesh...</div>
+                        <div style="font-weight: 500; font-size: 13px;">Encoding block mesh…</div>
                     </div>
                     <div class="viewer-header">
-                        <div class="viewer-title">MLZC Decompressed View</div>
-                        <div class="viewer-badge" id="recon-badge">-</div>
+                        <div class="viewer-title">🟣 MLZ Reconstructed</div>
+                        <div class="viewer-badge" id="recon-badge">—</div>
                     </div>
-                    <div class="canvas-wrapper" id="recon-wrapper">
-                        <div class="empty-placeholder">
+                    <div class="canvas-viewport" id="recon-viewport">
+                        <canvas id="recon-canvas"></canvas>
+                        <div class="empty-placeholder" id="recon-empty">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
-                            <div>Compare lossy/lossless outputs here</div>
+                            <p>Compare lossy / lossless outputs here</p>
                         </div>
+                        <div class="coords-display" id="recon-coords"></div>
                     </div>
                 </div>
             </div>
@@ -548,251 +660,408 @@
     </main>
 
     <script>
-        const dropzone = document.getElementById('dropzone');
-        const fileInput = document.getElementById('file-input');
-        const qualitySlider = document.getElementById('quality-slider');
-        const qualityVal = document.getElementById('quality-val');
-        const modeHint = document.getElementById('mode-hint');
-        const processBtn = document.getElementById('process-btn');
-        const downloadBtn = document.getElementById('download-btn');
-        const origWrapper = document.getElementById('orig-wrapper');
-        const reconWrapper = document.getElementById('recon-wrapper');
-        const reconLoader = document.getElementById('recon-loader');
+    // ─────────────────────────────────────────────────────────────────────────
+    //  SYNCHRONIZED ZOOM + PAN ENGINE
+    // ─────────────────────────────────────────────────────────────────────────
+    const MIN_ZOOM = 2 ** -3;   // 0.125×
+    const MAX_ZOOM = 2 ** 4;    // 16×
 
-        let blockSelection = 8;
-        let loadedFile = null;
-        let isMlzMode = false;
-        let compressedMlzBytes = null;
-        let originalFileName = "";
+    // Shared viewport state
+    const view = { zoom: 1, panX: 0, panY: 0 };
 
-        // Handle quality changes
-        qualitySlider.addEventListener('input', (e) => {
-            const val = e.target.value;
-            qualityVal.textContent = val + '%';
-            if (val >= 100) {
-                modeHint.textContent = "Lossless (Exact bitstream)";
-            } else {
-                modeHint.textContent = `Lossy (Quality: ${val}%)`;
+    // Per-viewport state for pointer tracking
+    const vpState = {
+        orig:  { dragging: false, startX: 0, startY: 0, startPanX: 0, startPanY: 0, img: null },
+        recon: { dragging: false, startX: 0, startY: 0, startPanX: 0, startPanY: 0, img: null }
+    };
+
+    const origCanvas   = document.getElementById('orig-canvas');
+    const reconCanvas  = document.getElementById('recon-canvas');
+    const origVP       = document.getElementById('orig-viewport');
+    const reconVP      = document.getElementById('recon-viewport');
+    const origEmpty    = document.getElementById('orig-empty');
+    const reconEmpty   = document.getElementById('recon-empty');
+    const zoomRange    = document.getElementById('zoom-range');
+    const zoomDisplay  = document.getElementById('zoom-display');
+    const origCoords   = document.getElementById('orig-coords');
+    const reconCoords  = document.getElementById('recon-coords');
+
+    function clampZoom(z) {
+        return Math.min(MAX_ZOOM, Math.max(MIN_ZOOM, z));
+    }
+
+    function applyZoomAround(newZoom, anchorX, anchorY, vpWidth, vpHeight) {
+        // Keep the image point under the cursor fixed in viewport space
+        const ratio = newZoom / view.zoom;
+        view.panX = anchorX - ratio * (anchorX - view.panX);
+        view.panY = anchorY - ratio * (anchorY - view.panY);
+        view.zoom = newZoom;
+        updateZoomUI();
+        renderAll();
+    }
+
+    function updateZoomUI() {
+        const pct = Math.round(view.zoom * 100);
+        zoomDisplay.textContent = pct + '%';
+        // Sync range slider (log2 scale)
+        zoomRange.value = Math.log2(view.zoom).toFixed(3);
+    }
+
+    function renderCanvas(canvas, viewport, state) {
+        const img = state.img;
+        const vw = viewport.clientWidth;
+        const vh = viewport.clientHeight;
+
+        canvas.width  = vw;
+        canvas.height = vh;
+
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, vw, vh);
+
+        // Checkerboard for transparency
+        const cs = 12;
+        for (let y = 0; y < vh; y += cs) {
+            for (let x = 0; x < vw; x += cs) {
+                ctx.fillStyle = ((x / cs + y / cs) % 2 === 0) ? '#1a1a1e' : '#141418';
+                ctx.fillRect(x, y, cs, cs);
             }
+        }
+
+        if (!img) return;
+
+        ctx.save();
+        ctx.imageSmoothingEnabled = view.zoom < 1;
+        ctx.imageSmoothingQuality = 'high';
+        ctx.translate(view.panX, view.panY);
+        ctx.scale(view.zoom, view.zoom);
+        ctx.drawImage(img, 0, 0);
+        ctx.restore();
+    }
+
+    function renderAll() {
+        renderCanvas(origCanvas,  origVP,  vpState.orig);
+        renderCanvas(reconCanvas, reconVP, vpState.recon);
+    }
+
+    // Fit image to viewport
+    function fitToView() {
+        const img = vpState.orig.img || vpState.recon.img;
+        if (!img) return;
+        const vw = origVP.clientWidth;
+        const vh = origVP.clientHeight;
+        const scale = Math.min(vw / img.width, vh / img.height) * 0.95;
+        view.zoom = clampZoom(scale);
+        view.panX = (vw  - img.width  * view.zoom) / 2;
+        view.panY = (vh  - img.height * view.zoom) / 2;
+        updateZoomUI();
+        renderAll();
+    }
+
+    function resetTo1x1() {
+        const vw = origVP.clientWidth;
+        const vh = origVP.clientHeight;
+        view.zoom = 1;
+        view.panX = (vw - (vpState.orig.img?.width  || 0)) / 2;
+        view.panY = (vh - (vpState.orig.img?.height || 0)) / 2;
+        updateZoomUI();
+        renderAll();
+    }
+
+    // ── Pointer events shared handler factory ──────────────────────────────
+    function attachPointerEvents(viewport, stateKey) {
+        const st = vpState[stateKey];
+
+        viewport.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            const rect = viewport.getBoundingClientRect();
+            const ax = e.clientX - rect.left;
+            const ay = e.clientY - rect.top;
+            const factor = e.deltaY < 0 ? 1.12 : 1 / 1.12;
+            applyZoomAround(clampZoom(view.zoom * factor), ax, ay, rect.width, rect.height);
+        }, { passive: false });
+
+        viewport.addEventListener('pointerdown', (e) => {
+            if (e.button !== 0) return;
+            viewport.setPointerCapture(e.pointerId);
+            st.dragging = true;
+            st.startX = e.clientX;
+            st.startY = e.clientY;
+            st.startPanX = view.panX;
+            st.startPanY = view.panY;
         });
-        qualitySlider.addEventListener('change', () => {
+
+        viewport.addEventListener('pointermove', (e) => {
+            const rect = viewport.getBoundingClientRect();
+            const vx = e.clientX - rect.left;
+            const vy = e.clientY - rect.top;
+
+            // Show pixel coordinates
+            const imgX = Math.floor((vx - view.panX) / view.zoom);
+            const imgY = Math.floor((vy - view.panY) / view.zoom);
+            const img = st.img;
+            if (img && imgX >= 0 && imgY >= 0 && imgX < img.width && imgY < img.height) {
+                document.getElementById(stateKey === 'orig' ? 'orig-coords' : 'recon-coords').textContent =
+                    `x:${imgX}  y:${imgY}`;
+            } else {
+                document.getElementById(stateKey === 'orig' ? 'orig-coords' : 'recon-coords').textContent = '';
+            }
+
+            if (!st.dragging) return;
+            const dx = e.clientX - st.startX;
+            const dy = e.clientY - st.startY;
+            view.panX = st.startPanX + dx;
+            view.panY = st.startPanY + dy;
+            renderAll();
+        });
+
+        viewport.addEventListener('pointerup',    () => { st.dragging = false; });
+        viewport.addEventListener('pointerleave', () => {
+            document.getElementById(stateKey === 'orig' ? 'orig-coords' : 'recon-coords').textContent = '';
+        });
+    }
+
+    attachPointerEvents(origVP,  'orig');
+    attachPointerEvents(reconVP, 'recon');
+
+    // ── Zoom control bar events ──────────────────────────────────────────
+    zoomRange.addEventListener('input', () => {
+        const newZoom = clampZoom(2 ** parseFloat(zoomRange.value));
+        const vw = origVP.clientWidth / 2;
+        const vh = origVP.clientHeight / 2;
+        applyZoomAround(newZoom, vw, vh, origVP.clientWidth, origVP.clientHeight);
+    });
+
+    document.getElementById('zoom-in-btn').addEventListener('click', () => {
+        const vw = origVP.clientWidth / 2, vh = origVP.clientHeight / 2;
+        applyZoomAround(clampZoom(view.zoom * 1.5), vw, vh);
+    });
+    document.getElementById('zoom-out-btn').addEventListener('click', () => {
+        const vw = origVP.clientWidth / 2, vh = origVP.clientHeight / 2;
+        applyZoomAround(clampZoom(view.zoom / 1.5), vw, vh);
+    });
+    document.getElementById('zoom-reset-btn').addEventListener('click', resetTo1x1);
+    document.getElementById('zoom-fit-btn').addEventListener('click', fitToView);
+
+    // Re-render on resize
+    const resizeObs = new ResizeObserver(renderAll);
+    resizeObs.observe(origVP);
+    resizeObs.observe(reconVP);
+
+    // ─────────────────────────────────────────────────────────────────────────
+    //  ENCODE / DECODE LOGIC (unchanged from original)
+    // ─────────────────────────────────────────────────────────────────────────
+
+    function showEmpty(key, show) {
+        document.getElementById(key + '-empty').style.display = show ? 'flex' : 'none';
+    }
+
+    function setImage(key, dataURL) {
+        const img = new Image();
+        img.onload = () => {
+            vpState[key].img = img;
+            showEmpty(key, false);
+            fitToView();
+        };
+        img.src = dataURL;
+    }
+
+    const dropzone    = document.getElementById('dropzone');
+    const fileInput   = document.getElementById('file-input');
+    const qualitySlider = document.getElementById('quality-slider');
+    const qualityVal    = document.getElementById('quality-val');
+    const modeHint      = document.getElementById('mode-hint');
+    const processBtn    = document.getElementById('process-btn');
+    const downloadBtn   = document.getElementById('download-btn');
+    const reconLoader   = document.getElementById('recon-loader');
+    const origLoader    = document.getElementById('orig-loader');
+
+    let blockSelection = 8;
+    let loadedFile = null;
+    let isMlzMode = false;
+    let compressedMlzBytes = null;
+    let originalFileName = "";
+
+    qualitySlider.addEventListener('input', (e) => {
+        const val = e.target.value;
+        qualityVal.textContent = val + '%';
+        modeHint.textContent = val >= 100 ? "Lossless (Exact bitstream)" : `Lossy (Quality: ${val}%)`;
+    });
+    qualitySlider.addEventListener('change', () => {
+        if (loadedFile && !isMlzMode) processBtn.click();
+    });
+
+    const paletteCheck   = document.getElementById('palette-checkbox');
+    const ycocgCheck     = document.getElementById('ycocg-checkbox');
+    const subsampleCheck = document.getElementById('subsample-checkbox');
+
+    function enforceDependencies(sourceId) {
+        if (sourceId === 'palette-checkbox' && paletteCheck.checked) {
+            qualitySlider.disabled = true;
+            ycocgCheck.checked = false; ycocgCheck.disabled = true;
+            subsampleCheck.checked = false; subsampleCheck.disabled = true;
+        } else if (sourceId === 'palette-checkbox' && !paletteCheck.checked) {
+            qualitySlider.disabled = false;
+            ycocgCheck.disabled = false; subsampleCheck.disabled = false;
+        }
+        if (sourceId === 'subsample-checkbox' && subsampleCheck.checked) ycocgCheck.checked = true;
+        if (sourceId === 'ycocg-checkbox' && !ycocgCheck.checked) subsampleCheck.checked = false;
+    }
+
+    ['palette-checkbox', 'ycocg-checkbox', 'subsample-checkbox'].forEach(id => {
+        const cb = document.getElementById(id);
+        cb.addEventListener('change', (e) => {
+            enforceDependencies(e.target.id);
             if (loadedFile && !isMlzMode) processBtn.click();
         });
+    });
 
-        // Handle checkbox changes and dependencies
-        const paletteCheck = document.getElementById('palette-checkbox');
-        const ycocgCheck = document.getElementById('ycocg-checkbox');
-        const subsampleCheck = document.getElementById('subsample-checkbox');
+    document.querySelectorAll('.select-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            document.querySelectorAll('.select-btn').forEach(b => b.classList.remove('active'));
+            e.target.classList.add('active');
+            blockSelection = parseInt(e.target.getAttribute('data-val'));
+            if (loadedFile && !isMlzMode) processBtn.click();
+        });
+    });
 
-        function enforceDependencies(sourceId) {
-            if (sourceId === 'palette-checkbox' && paletteCheck.checked) {
-                qualitySlider.disabled = true;
-                // Palette forces YCoCg and Subsampling off
-                ycocgCheck.checked = false;
-                ycocgCheck.disabled = true;
-                subsampleCheck.checked = false;
-                subsampleCheck.disabled = true;
-            } else if (sourceId === 'palette-checkbox' && !paletteCheck.checked) {
-                qualitySlider.disabled = false;
-                ycocgCheck.disabled = false;
-                subsampleCheck.disabled = false;
-            }
+    dropzone.addEventListener('click', () => fileInput.click());
+    ['dragenter', 'dragover'].forEach(ev => {
+        dropzone.addEventListener(ev, (e) => { e.preventDefault(); dropzone.classList.add('dragover'); }, false);
+    });
+    ['dragleave', 'drop'].forEach(ev => {
+        dropzone.addEventListener(ev, (e) => { e.preventDefault(); dropzone.classList.remove('dragover'); }, false);
+    });
+    dropzone.addEventListener('drop', (e) => {
+        const files = e.dataTransfer.files;
+        if (files.length > 0) handleFile(files[0]);
+    });
+    fileInput.addEventListener('change', (e) => {
+        if (e.target.files.length > 0) handleFile(e.target.files[0]);
+    });
 
-            if (sourceId === 'subsample-checkbox' && subsampleCheck.checked) {
-                ycocgCheck.checked = true;
-            }
-            if (sourceId === 'ycocg-checkbox' && !ycocgCheck.checked) {
-                subsampleCheck.checked = false;
-            }
+    function handleFile(file) {
+        loadedFile = file;
+        originalFileName = file.name;
+        const ext = file.name.split('.').pop().toLowerCase();
+        isMlzMode = (ext === 'mlz');
+
+        document.getElementById('dropzone-text').textContent = file.name;
+        processBtn.disabled = false;
+        downloadBtn.style.display = 'none';
+
+        // Reset both canvases
+        vpState.orig.img  = null;
+        vpState.recon.img = null;
+        showEmpty('orig',  true);
+        showEmpty('recon', true);
+        renderAll();
+
+        if (isMlzMode) {
+            processBtn.textContent = "Decompress Payload";
+            qualitySlider.disabled = true;
+            document.querySelectorAll('.select-btn').forEach(b => b.disabled = true);
+        } else {
+            processBtn.textContent = "Compress to MLZC";
+            qualitySlider.disabled = false;
+            document.querySelectorAll('.select-btn').forEach(b => b.disabled = false);
+
+            // Show original in left canvas immediately
+            origLoader.classList.add('active');
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                setImage('orig', ev.target.result);
+                document.getElementById('orig-badge').textContent = `Format: ${ext.toUpperCase()}`;
+                document.getElementById('stat-orig').textContent = formatBytes(file.size);
+                origLoader.classList.remove('active');
+            };
+            reader.readAsDataURL(file);
         }
+    }
 
-        ['palette-checkbox', 'ycocg-checkbox', 'subsample-checkbox'].forEach(id => {
-            const checkbox = document.getElementById(id);
-            if (checkbox) {
-                checkbox.addEventListener('change', (e) => {
-                    enforceDependencies(e.target.id);
-                    if (loadedFile && !isMlzMode) processBtn.click();
-                });
-            }
-        });
-
-        // Run initially to set correct state
-        if (paletteCheck) enforceDependencies('palette-checkbox');
-
-        // Block size selection buttons
-        document.querySelectorAll('.select-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                document.querySelectorAll('.select-btn').forEach(b => b.classList.remove('active'));
-                e.target.classList.add('active');
-                blockSelection = parseInt(e.target.getAttribute('data-val'));
-                if (loadedFile && !isMlzMode) processBtn.click();
-            });
-        });
-
-        // Trigger file inputs
-        dropzone.addEventListener('click', () => fileInput.click());
-
-        // Drag events
-        ['dragenter', 'dragover'].forEach(eventName => {
-            dropzone.addEventListener(eventName, (e) => {
-                e.preventDefault();
-                dropzone.classList.add('dragover');
-            }, false);
-        });
-
-        ['dragleave', 'drop'].forEach(eventName => {
-            dropzone.addEventListener(eventName, (e) => {
-                e.preventDefault();
-                dropzone.classList.remove('dragover');
-            }, false);
-        });
-
-        dropzone.addEventListener('drop', (e) => {
-            const dt = e.dataTransfer;
-            const files = dt.files;
-            if (files.length > 0) {
-                handleFile(files[0]);
-            }
-        });
-
-        fileInput.addEventListener('change', (e) => {
-            if (e.target.files.length > 0) {
-                handleFile(e.target.files[0]);
-            }
-        });
-
-        function handleFile(file) {
-            loadedFile = file;
-            originalFileName = file.name;
-            const ext = file.name.split('.').pop().toLowerCase();
-            isMlzMode = (ext === 'mlz');
-
-            document.getElementById('dropzone-text').textContent = file.name;
-            processBtn.disabled = false;
-            downloadBtn.style.display = 'none';
-
-            if (isMlzMode) {
-                // Decompression flow
-                processBtn.textContent = "Decompress Payload";
-                qualitySlider.disabled = true;
-                document.querySelectorAll('.select-btn').forEach(b => b.disabled = true);
-            } else {
-                // Compression flow
-                processBtn.textContent = "Compress to MLZC";
-                qualitySlider.disabled = false;
-                document.querySelectorAll('.select-btn').forEach(b => b.disabled = false);
-
-                // Show original preview in Left Box
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    origWrapper.innerHTML = `<img src="${e.target.result}" id="orig-img" />`;
-                    document.getElementById('orig-badge').textContent = `Format: ${ext.toUpperCase()}`;
-                    document.getElementById('stat-orig').textContent = formatBytes(file.size);
-                };
-                reader.readAsDataURL(file);
-            }
+    processBtn.addEventListener('click', async () => {
+        if (!loadedFile) return;
+        reconLoader.classList.add('active');
+        try {
+            if (isMlzMode) await runDecompression();
+            else           await runCompression();
+        } catch (err) {
+            alert("Operation failed: " + err.message);
+        } finally {
+            reconLoader.classList.remove('active');
         }
+    });
 
-        processBtn.addEventListener('click', async () => {
-            if (!loadedFile) return;
+    async function runCompression() {
+        const quality    = qualitySlider.value;
+        const usePalette = paletteCheck.checked;
+        const useYcocg   = ycocgCheck.checked;
+        const subsample  = subsampleCheck.checked;
+        const url = `/api/compress?quality=${quality}&block_size=${blockSelection}&palette=${usePalette}&ycocg=${useYcocg}&subsample=${subsample}`;
 
-            reconLoader.classList.add('active');
-            try {
-                if (isMlzMode) {
-                    await runDecompression();
-                } else {
-                    await runCompression();
-                }
-            } catch (err) {
-                alert("Operation failed: " + err.message);
-            } finally {
-                reconLoader.classList.remove('active');
-            }
-        });
+        const response = await fetch(url, { method: 'POST', body: loadedFile });
+        if (!response.ok) throw new Error(await response.text() || "Compression failed");
 
-        async function runCompression() {
-            const quality = qualitySlider.value;
-            const usePalette = document.getElementById('palette-checkbox').checked;
-            const useYcocg = document.getElementById('ycocg-checkbox').checked;
-            const subsample = document.getElementById('subsample-checkbox').checked;
-            const url = `/api/compress?quality=${quality}&block_size=${blockSelection}&palette=${usePalette}&ycocg=${useYcocg}&subsample=${subsample}`;
-            
-            // Upload original image as binary body
-            const response = await fetch(url, {
-                method: 'POST',
-                body: loadedFile
-            });
+        const json = await response.json();
 
-            if (!response.ok) {
-                const text = await response.text();
-                throw new Error(text || "Compression failed");
-            }
+        // Store compressed MLZ bytes
+        const binaryString = window.atob(json.mlz_b64);
+        const bytes = new Uint8Array(binaryString.length);
+        for (let i = 0; i < binaryString.length; i++) bytes[i] = binaryString.charCodeAt(i);
+        compressedMlzBytes = bytes;
 
-            const json = await response.json();
-            
-            // Store compressed bytes base64 to binary
-            const binaryString = window.atob(json.mlz_b64);
-            const bytes = new Uint8Array(binaryString.length);
-            for (let i = 0; i < binaryString.length; i++) {
-                bytes[i] = binaryString.charCodeAt(i);
-            }
-            compressedMlzBytes = bytes;
+        // Load reconstructed image into right canvas
+        setImage('recon', `data:image/png;base64,${json.png_b64}`);
+        document.getElementById('recon-badge').textContent = `Block: ${blockSelection}×${blockSelection}`;
 
-            // Update previews and badges
-            reconWrapper.innerHTML = `<img src="data:image/png;base64,${json.png_b64}" />`;
-            document.getElementById('recon-badge').textContent = `Block: ${blockSelection}x${blockSelection}`;
-            
-            // Update stats
-            document.getElementById('stat-comp').textContent = formatBytes(json.compressed_size);
-            document.getElementById('stat-ratio').textContent = `${json.ratio.toFixed(2)}x`;
-            
-            const psnrText = json.psnr >= 99.0 ? "Lossless (Infinite)" : `${json.psnr.toFixed(2)} dB`;
-            document.getElementById('stat-psnr').textContent = psnrText;
+        document.getElementById('stat-comp').textContent = formatBytes(json.compressed_size);
+        document.getElementById('stat-ratio').textContent = `${json.ratio.toFixed(2)}×`;
+        const psnrText = json.psnr >= 99.0 ? "Lossless (∞)" : `${json.psnr.toFixed(2)} dB`;
+        document.getElementById('stat-psnr').textContent = psnrText;
 
-            downloadBtn.style.display = 'flex';
-        }
+        downloadBtn.style.display = 'flex';
+    }
 
-        async function runDecompression() {
-            const response = await fetch('/api/decompress', {
-                method: 'POST',
-                body: loadedFile
-            });
+    async function runDecompression() {
+        const response = await fetch('/api/decompress', { method: 'POST', body: loadedFile });
+        if (!response.ok) throw new Error(await response.text() || "Decompression failed");
 
-            if (!response.ok) {
-                const text = await response.text();
-                throw new Error(text || "Decompression failed");
-            }
+        const json = await response.json();
 
-            const json = await response.json();
-            
-            // Display decompressed image in Right Viewbox
-            reconWrapper.innerHTML = `<img src="data:image/png;base64,${json.png_b64}" />`;
-            document.getElementById('recon-badge').textContent = `${json.width}x${json.height} (${json.channels === 1 ? 'Luma' : 'RGB'})`;
+        setImage('recon', `data:image/png;base64,${json.png_b64}`);
+        document.getElementById('recon-badge').textContent =
+            `${json.width}×${json.height} (${json.channels === 1 ? 'Luma' : 'RGB'})`;
 
-            // Reset stats since we don't have original image size context
-            document.getElementById('stat-comp').textContent = formatBytes(loadedFile.size);
-            document.getElementById('stat-orig').textContent = "-";
-            document.getElementById('stat-ratio').textContent = "-";
-            document.getElementById('stat-psnr').textContent = "Restored Lossless/Lossy";
-        }
+        document.getElementById('stat-comp').textContent = formatBytes(loadedFile.size);
+        document.getElementById('stat-orig').textContent = "-";
+        document.getElementById('stat-ratio').textContent = "-";
+        document.getElementById('stat-psnr').textContent = "Restored Lossless/Lossy";
+    }
 
-        downloadBtn.addEventListener('click', () => {
-            if (!compressedMlzBytes) return;
-            const blob = new Blob([compressedMlzBytes], { type: 'application/octet-stream' });
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            const baseName = originalFileName.split('.').slice(0, -1).join('.');
-            link.download = `${baseName}.mlz`;
-            link.click();
-        });
+    downloadBtn.addEventListener('click', () => {
+        if (!compressedMlzBytes) return;
+        const blob = new Blob([compressedMlzBytes], { type: 'application/octet-stream' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        const baseName = originalFileName.split('.').slice(0, -1).join('.');
+        link.download = `${baseName}.mlz`;
+        link.click();
+    });
 
-        function formatBytes(bytes) {
-            if (bytes === 0) return '0 Bytes';
-            const k = 1024;
-            const sizes = ['Bytes', 'KB', 'MB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-        }
+    function formatBytes(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
+
+    // Show port from current URL
+    document.getElementById('port-display').textContent = 'Port ' + location.port;
+
+    // Initial empty render
+    showEmpty('orig',  true);
+    showEmpty('recon', true);
+    renderAll();
     </script>
 </body>
 </html>

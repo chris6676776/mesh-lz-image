@@ -46,22 +46,55 @@ pub enum LzCommand {
 pub fn encode_block_lz(pixels: &[Pixel], min_match_len: usize) -> Vec<LzCommand> {
     let n = pixels.len();
     let mut commands = Vec::new();
-    let mut i = 0;
+    
+    if n == 0 {
+        return commands;
+    }
 
+    const HASH_SIZE: usize = 1024;
+    const MAX_CHAIN_DEPTH: usize = 8;
+    
+    let mut head = vec![usize::MAX; HASH_SIZE];
+    let mut next = vec![usize::MAX; n];
+    
+    let hash_pixels = |idx: usize| -> usize {
+        if idx + 2 < n {
+            let p0 = &pixels[idx];
+            let p1 = &pixels[idx + 1];
+            let p2 = &pixels[idx + 2];
+            let v0 = (p0.channels[0] as u32) | ((p0.channels[1] as u32) << 8) | ((p0.channels[2] as u32) << 16);
+            let v1 = (p1.channels[0] as u32) | ((p1.channels[1] as u32) << 8) | ((p1.channels[2] as u32) << 16);
+            let v2 = (p2.channels[0] as u32) | ((p2.channels[1] as u32) << 8) | ((p2.channels[2] as u32) << 16);
+            let h = v0.wrapping_mul(0x1e35a7bd) ^ v1.wrapping_mul(0x5b3731) ^ v2.wrapping_mul(0x937);
+            ((h ^ (h >> 16)) as usize) & (HASH_SIZE - 1)
+        } else {
+            0
+        }
+    };
+
+    let mut i = 0;
     while i < n {
         let mut best_len = 0;
         let mut best_offset = 0;
 
-        // Search for the longest match in the history pixels[0..i]
-        for j in 0..i {
-            let offset = (i - j) as u16;
-            let mut len = 0;
-            while i + len < n && pixels[j + len] == pixels[i + len] {
-                len += 1;
-            }
-            if len > best_len {
-                best_len = len;
-                best_offset = offset;
+        if i + 2 < n {
+            let h = hash_pixels(i);
+            let mut curr = head[h];
+            let mut depth = 0;
+
+            while curr != usize::MAX && depth < MAX_CHAIN_DEPTH {
+                if curr < i { // Only match backwards
+                    let mut len = 0;
+                    while i + len < n && pixels[curr + len] == pixels[i + len] {
+                        len += 1;
+                    }
+                    if len > best_len {
+                        best_len = len;
+                        best_offset = (i - curr) as u16;
+                    }
+                }
+                curr = next[curr];
+                depth += 1;
             }
         }
 
@@ -70,9 +103,22 @@ pub fn encode_block_lz(pixels: &[Pixel], min_match_len: usize) -> Vec<LzCommand>
                 offset: best_offset,
                 length: best_len as u8,
             });
+            // Update hash chains for skipped pixels
+            for k in 0..best_len {
+                if i + k + 2 < n {
+                    let h = hash_pixels(i + k);
+                    next[i + k] = head[h];
+                    head[h] = i + k;
+                }
+            }
             i += best_len;
         } else {
             commands.push(LzCommand::Literal(pixels[i]));
+            if i + 2 < n {
+                let h = hash_pixels(i);
+                next[i] = head[h];
+                head[h] = i;
+            }
             i += 1;
         }
     }
