@@ -6,7 +6,6 @@ Mesh-LZ is a custom image compression format written in Rust, featuring an Inter
 
 Ensure you have Rust and Cargo installed.
 
-```bash
 # Clone the repository
 git clone https://github.com/chris6676776/mesh-lz-image.git
 cd newform
@@ -14,18 +13,16 @@ cd newform
 # Build the release binary
 Mesh-LZ includes a hardware-accelerated desktop application to visually compress and compare images.
 
-```bash
+```
 cargo run --release
 ```
-
+```
 # Run the CLI
 target/release/mesh_lz_codec.exe --help
 ```
-
-
 ### Running the Web GUI Dashboard
 Mesh-LZ includes a visual browser dashboard to interactively compress and view images.
-```bash
+```
 cargo run --release --bin mesh_lz_codec -- gui --port 8080
 ```
 
@@ -37,22 +34,27 @@ Mesh-LZ supports multiple modes to give you fine-grained control over the Rate-D
 
 ### 1. Lossless Mode (Default)
 **Command:** `mesh_lz_codec compress -i in.png -o out.mlz -q 100 -b 16`
+
 The default mode (quality 100) provides mathematically lossless compression. In benchmarking, Mesh-LZ 16x16 achieves **11.5 bpp**, outperforming standard PNG (15.3 bpp) by roughly 25%.
 
 ### 2. Lossy RGB (Quantization)
 **Command:** `mesh_lz_codec compress -i in.png -o out.mlz -q <1-99>`
+
 Applies pure scalar quantization to the spatial residuals or frequency domain. Lower quality values yield smaller files.
 
 ### 3. Palette Mode (NeuQuant)
 **Command:** `mesh_lz_codec compress -i in.png -o out.mlz --palette`
+
 Reduces the 24-bit TrueColor image down to an optimized 8-bit (256 color) palette before lossless encoding. This is highly efficient for graphics but introduces lossy color banding in photographs.
 
 ### 4. YCoCg-R Color Decorrelation
 **Command:** `mesh_lz_codec compress -i in.png -o out.mlz -y -q <1-99>`
+
 Instead of compressing in RGB, the image is converted to the reversible YCoCg-R color space. This separates brightness (Luma) from color (Chroma), which typically compresses much better mathematically.
 
 ### 5. Chroma Subsampling (YCoCg 4:2:0)
 **Command:** `mesh_lz_codec compress -i in.png -o out.mlz -y -s -q <1-99>`
+
 The ultimate mode for web compression. Human eyes are less sensitive to color resolution than brightness. This mode preserves full brightness detail but discards 75% of the color resolution. It drastically reduces file size with minimal visual impact.
 
 ---
