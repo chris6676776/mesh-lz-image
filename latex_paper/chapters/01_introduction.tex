@@ -1,0 +1,42 @@
+\chapter{Introduction}
+\label{ch:introduction}
+
+The explosion of digital imaging across web platforms, mobile applications, and archival systems has driven a continuous demand for advanced image compression algorithms. The foundational principles of image compression rely on exploiting three primary forms of redundancy inherent to visual data: spatial redundancy (correlations between neighboring pixels in a local region), spectral redundancy (correlations between discrete color channels), and psycho-visual redundancy (high-frequency details or subtle color variations that remain largely imperceptible to the human visual system). 
+
+Historically, formats like the Joint Photographic Experts Group (JPEG) standard have dominated the lossy compression domain. JPEG achieves its compression by dividing the image into $8 \times 8$ pixel blocks, applying the Discrete Cosine Transform (DCT) to convert spatial data into the frequency domain, quantizing the resulting frequency coefficients to discard high-frequency noise, and finally utilizing Huffman coding for entropy compression. Conversely, the Portable Network Graphics (PNG) format has served as the \textit{de facto} standard for lossless compression on the web. PNG operates entirely in the spatial domain, utilizing a set of predictive filters (Sub, Up, Average, Paeth) to decorrelate the 2D grid, followed by the DEFLATE algorithm, a combination of LZ77 dictionary matching and Huffman coding \cite{roelofs1999png}.
+
+In recent years, the landscape of digital image compression has been transformed by the introduction of newer, highly sophisticated formats such as WebP \cite{google2010webp} (derived from the intra-prediction frames of the VP8 video codec) and JPEG XL \cite{alakuijala2019jpeg}, which introduce complex context-modeling, multi-scale modular transforms, and adaptive block sizing. While these modern formats achieve unparalleled rate-distortion (RD) performance, compressing images to a fraction of the size of traditional JPEGs without perceptual loss, they inherently suffer from significantly increased algorithmic complexity. This complexity translates directly into higher computational costs during both the encoding and decoding phases. High decoding latency, in particular, represents a critical bottleneck for modern web-based delivery systems, real-time texture streaming in video games, and low-power mobile devices constrained by thermal and battery limits.
+
+This thesis presents \textbf{Mesh-LZ}, a novel image compression codec constructed specifically to bridge the gap between high-efficiency spatial parsing and ultra-low latency decompression. Mesh-LZ deliberately abandons traditional DCT or wavelet-based transform domains in favor of a purely spatial-domain strategy. The core innovation of the Mesh-LZ architecture resides in the synthesis of dynamic 1D spatial stenciling with Lempel-Ziv dictionary matching \cite{ziv1977universal}, ultimately encoded via an Interleaved Asymmetric Numeral Systems (rANS) entropy coder \cite{duda2013asymmetric}.
+
+\section{Problem Statement}
+
+The primary challenge in modern codec design is the asymmetry between compression ratio and computational complexity. Codecs that utilize advanced context modeling (such as Context-Adaptive Binary Arithmetic Coding, CABAC) require the decoder to constantly update probability models based on previously decoded neighboring pixels. This introduces strict data dependencies that fundamentally inhibit parallel execution on modern superscalar CPUs. The decoder must wait for pixel $P_{i-1}$ to be fully decoded and its probability model updated before it can begin decoding pixel $P_i$. 
+
+Consequently, despite the massive increases in multi-core CPU architectures and SIMD (Single Instruction, Multiple Data) vectorization capabilities over the last decade, image decompression remains largely a serial bottleneck. The problem this thesis aims to solve is to design an image codec that achieves compression ratios competitive with modern standards (WebP, JPEG XL) while explicitly removing data dependencies during the decoding phase to allow for ultra-fast, highly parallelized execution.
+
+\section{Proposed Solution and Contributions}
+
+Mesh-LZ proposes a paradigm shift in spatial compression. Rather than relying on complex, mathematically dense transform domains or serial context modeling, Mesh-LZ operates on independent pixel blocks and utilizes a novel heuristic to map 2D spatial correlations into 1D sequences that are easily parsed by classic string-matching algorithms.
+
+The primary contributions of this thesis and the Mesh-LZ codec are as follows:
+\begin{itemize}
+    \item \textbf{Dynamic Spatial Stenciling:} We introduce a variance-driven heuristic block analyzer that evaluates the horizontal and vertical gradients of an image block to dynamically select the optimal 1D traversal path (Raster Scan, Columnar Scan, or Hilbert Space-Filling Curve). This maximizes localized correlation, effectively feeding the dictionary compressor a highly redundant string of pixels.
+    \item \textbf{2D-to-1D Lempel-Ziv Application:} A novel approach to leveraging LZ77-style backward reference matching on contiguous spatial pixel strings rather than traditional raw byte streams, resulting in exceptional lossless compression ratios.
+    \item \textbf{Interleaved rANS Entropy Coding:} The implementation of a multi-stream rANS coder tailored for the specific Mesh-LZ syntax elements (LZ commands, quantized residuals, offsets, and match lengths). By interleaving multiple rANS states, the architecture breaks the serial dependency chain, enabling single-pass, SIMD-friendly, high-throughput decompression.
+    \item \textbf{Flexible Hybrid Pipelines:} The development of a unified codec backend that supports mathematically lossless encoding, strict Palette-based encoding (utilizing Kohonen NeuQuant vector quantization \cite{dekker1994kohonen}), and variable-quality lossy encoding via Reversible YCoCg-R color decorrelation \cite{malvar2003lifting}, 4:2:0 chroma subsampling, and uniform scalar quantization.
+\end{itemize}
+
+\section{Structure of the Thesis}
+
+The remainder of this thesis is structured to provide a comprehensive, mathematically rigorous analysis of the Mesh-LZ codec. 
+
+Chapter \ref{ch:background} provides the theoretical background surrounding information theory, dictionary-based compression, entropy algorithms (specifically comparing Huffman, Arithmetic Coding, and Asymmetric Numeral Systems), and the mathematics of color space transformations. 
+
+Chapter \ref{ch:architecture} details the core architecture and pipeline of the Mesh-LZ encoder and decoder, exploring the specific transformations applied to the image data at each discrete stage. 
+
+Chapter \ref{ch:algorithms} delves deeply into the algorithmic implementations, providing the formal mathematical proofs for the Interleaved rANS state updates, the pseudo-code for the dynamic stenciling and LZ matching logic, and an analysis of the multi-threading paradigm implemented via the Rust \textit{rayon} library. 
+
+Chapter \ref{ch:evaluation} presents a rigorous performance evaluation and statistical benchmarking analysis. We compare Mesh-LZ against PNG, JPEG, WebP, and JPEG XL across a standardized dataset, evaluating bits-per-pixel (BPP), Structural Similarity Index Measure (SSIM), and computational latency profiles. 
+
+Finally, Chapter \ref{ch:conclusion} discusses the limitations of the current architecture, proposes future trajectories for this research (such as machine-learning-driven stencil selection), and concludes the thesis.

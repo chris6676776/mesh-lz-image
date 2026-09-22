@@ -1,0 +1,48 @@
+\contentsline {chapter}{\numberline {1}Introduction}{2}{chapter.1}%
+\contentsline {section}{\numberline {1.1}Problem Statement}{3}{section.1.1}%
+\contentsline {section}{\numberline {1.2}Proposed Solution and Contributions}{4}{section.1.2}%
+\contentsline {section}{\numberline {1.3}Structure of the Thesis}{4}{section.1.3}%
+\contentsline {chapter}{\numberline {2}Theoretical Background}{6}{chapter.2}%
+\contentsline {section}{\numberline {2.1}Information Theory and Entropy}{6}{section.2.1}%
+\contentsline {section}{\numberline {2.2}Entropy Coding Paradigms}{7}{section.2.2}%
+\contentsline {subsection}{\numberline {2.2.1}Huffman Coding}{7}{subsection.2.2.1}%
+\contentsline {subsection}{\numberline {2.2.2}Arithmetic Coding}{7}{subsection.2.2.2}%
+\contentsline {subsection}{\numberline {2.2.3}Asymmetric Numeral Systems (ANS)}{8}{subsection.2.2.3}%
+\contentsline {section}{\numberline {2.3}Dictionary-Based Compression (Lempel-Ziv)}{9}{section.2.3}%
+\contentsline {section}{\numberline {2.4}Color Space Decorrelation: The YCoCg-R Transform}{9}{section.2.4}%
+\contentsline {chapter}{\numberline {3}The Mesh-LZ Architecture}{11}{chapter.3}%
+\contentsline {section}{\numberline {3.1}System Pipeline Overview}{11}{section.3.1}%
+\contentsline {subsection}{\numberline {3.1.1}Encoding Flow}{11}{subsection.3.1.1}%
+\contentsline {subsection}{\numberline {3.1.2}Decoding Flow}{12}{subsection.3.1.2}%
+\contentsline {section}{\numberline {3.2}Dynamic Stencil Selection Heuristics}{13}{section.3.2}%
+\contentsline {section}{\numberline {3.3}Scalar Quantization and Zig-Zag Mapping}{14}{section.3.3}%
+\contentsline {chapter}{\numberline {4}Algorithmic Implementation}{15}{chapter.4}%
+\contentsline {section}{\numberline {4.1}1D Spatial Lempel-Ziv Parsing}{15}{section.4.1}%
+\contentsline {section}{\numberline {4.2}Interleaved rANS Entropy Coding}{17}{section.4.2}%
+\contentsline {section}{\numberline {4.3}Rayon-Driven Parallelization and Multi-threading}{18}{section.4.3}%
+\contentsline {chapter}{\numberline {5}Performance Evaluation and Benchmarking}{19}{chapter.5}%
+\contentsline {section}{\numberline {5.1}Methodology and Dataset}{19}{section.5.1}%
+\contentsline {section}{\numberline {5.2}Lossless Compression Performance}{20}{section.5.2}%
+\contentsline {subsection}{\numberline {5.2.1}Analysis of Lossless Results}{20}{subsection.5.2.1}%
+\contentsline {section}{\numberline {5.3}Lossy Rate-Distortion Analysis}{21}{section.5.3}%
+\contentsline {subsection}{\numberline {5.3.1}RGB vs. YCoCg-R Decorrelation}{21}{subsection.5.3.1}%
+\contentsline {subsection}{\numberline {5.3.2}The Impact of Chroma Subsampling}{21}{subsection.5.3.2}%
+\contentsline {subsection}{\numberline {5.3.3}Palette Quantization}{21}{subsection.5.3.3}%
+\contentsline {section}{\numberline {5.4}Computational Complexity and Asymmetry}{22}{section.5.4}%
+\contentsline {chapter}{\numberline {6}Binary File Format Specification}{23}{chapter.6}%
+\contentsline {section}{\numberline {6.1}File Signature and Header}{23}{section.6.1}%
+\contentsline {subsection}{\numberline {6.1.1}Color Space Modes}{23}{subsection.6.1.1}%
+\contentsline {section}{\numberline {6.2}Palette Chunk (Optional)}{24}{section.6.2}%
+\contentsline {section}{\numberline {6.3}Block Payload Structure}{24}{section.6.3}%
+\contentsline {subsection}{\numberline {6.3.1}Bitstream Payload Details}{24}{subsection.6.3.1}%
+\contentsline {section}{\numberline {6.4}EOF Marker}{25}{section.6.4}%
+\contentsline {chapter}{\numberline {7}Appendix: Core Algorithmic Implementations}{26}{chapter.7}%
+\contentsline {section}{\numberline {7.1}Hilbert Curve Stencil Generator}{26}{section.7.1}%
+\contentsline {section}{\numberline {7.2}YCoCg-R Reversible Color Transform}{27}{section.7.2}%
+\contentsline {section}{\numberline {7.3}Interleaved rANS Decoder Loop}{28}{section.7.3}%
+\contentsline {chapter}{\numberline {8}Conclusion and Future Work}{30}{chapter.8}%
+\contentsline {section}{\numberline {8.1}Conclusion}{30}{section.8.1}%
+\contentsline {section}{\numberline {8.2}Future Work}{31}{section.8.2}%
+\contentsline {subsection}{\numberline {8.2.1}Machine Learning Stencil Selection}{31}{subsection.8.2.1}%
+\contentsline {subsection}{\numberline {8.2.2}Inter-block DC Prediction}{31}{subsection.8.2.2}%
+\contentsline {subsection}{\numberline {8.2.3}Hardware SIMD Intrinsics}{31}{subsection.8.2.3}%

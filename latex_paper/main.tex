@@ -1,0 +1,56 @@
+\documentclass[12pt,a4paper]{report}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{amssymb}
+\usepackage{graphicx}
+\usepackage{geometry}
+\usepackage{setspace}
+\usepackage[hidelinks]{hyperref}
+\usepackage[ruled,vlined]{algorithm2e}
+\usepackage{cite}
+\usepackage{url}
+
+% Geometry for a standard symmetric display
+\geometry{margin=1in}
+\setstretch{1.5} % 1.5 spacing is standard for theses to help achieve length and readability
+
+
+\begin{document}
+
+% ── Title page (no page number) ──────────────────────────────────────────────
+\begin{titlepage}
+    \centering
+    \vspace*{4cm}
+    {\LARGE \textbf{Mesh-LZ: A High-Efficiency Asymmetric Image Compression
+    Algorithm Utilizing Dynamic Spatial Stencils and Interleaved Asymmetric
+    Numeral Systems}\par}
+\end{titlepage}
+
+% ── Front matter: Roman numerals ─────────────────────────────────────────────
+\pagenumbering{roman}
+\setcounter{page}{1}
+
+\begin{abstract}
+Modern image compression necessitates a continuous trade-off between spatial quality, file size reduction, and computational complexity. While contemporary formats such as WebP and JPEG XL provide state-of-the-art rate-distortion performance, their decoding algorithms are frequently mathematically dense and computationally symmetrical. We introduce Mesh-LZ, a novel, block-based image codec designed around a dynamic spatial stencil selection process paired with Lempel-Ziv parsing and Interleaved rANS (Asymmetric Numeral Systems) entropy coding. By reducing 2D spatial pixel redundancies into 1D sequences via variance-driven heuristic stenciling (Raster, Column, and Hilbert curve paths), Mesh-LZ exploits spatial correlations with remarkable efficiency. Furthermore, for lossy applications, Mesh-LZ implements reversible YCoCg-R color decorrelation and 4:2:0 chroma subsampling, achieving highly competitive rate-distortion profiles against both JPEG and WebP. Notably, the architecture yields highly asymmetrical computational demands, resulting in decoding latencies strictly bounded to single-digit milliseconds even for dense, high-resolution imagery. This thesis details the architecture, mathematical underpinnings, algorithmic implementations, and performance benchmarking of the Mesh-LZ format across lossless, palette-reduced, and scalar quantized paradigms.
+\end{abstract}
+
+\tableofcontents
+
+% ── Main body: Arabic numerals ────────────────────────────────────────────────
+\pagenumbering{arabic}
+\setcounter{page}{1}
+
+\include{chapters/01_introduction}
+\include{chapters/02_background}
+\include{chapters/03_architecture}
+\include{chapters/04_algorithms}
+\include{chapters/05_evaluation}
+\include{chapters/07_spec}
+\include{chapters/08_appendix}
+\include{chapters/06_conclusion}
+
+\bibliographystyle{IEEEtran}
+\bibliography{references}
+
+\end{document}

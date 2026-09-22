@@ -2,6 +2,7 @@
 name = "mesh_lz_codec"
 version = "0.1.0"
 edition = "2021"
+default-run = "mesh_lz_codec"
 
 [dependencies]
 clap = { version = "4.4", features = ["derive"] }

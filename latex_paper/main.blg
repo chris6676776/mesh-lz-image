@@ -1,0 +1,74 @@
+This is BibTeX, Version 0.99e
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
+The top-level auxiliary file: main.aux
+Reallocating 'name_of_file' (item size: 1) to 29 items.
+A level-1 auxiliary file: chapters/01_introduction.aux
+Reallocating 'name_of_file' (item size: 1) to 27 items.
+A level-1 auxiliary file: chapters/02_background.aux
+Reallocating 'name_of_file' (item size: 1) to 29 items.
+A level-1 auxiliary file: chapters/03_architecture.aux
+Reallocating 'name_of_file' (item size: 1) to 27 items.
+A level-1 auxiliary file: chapters/04_algorithms.aux
+Reallocating 'name_of_file' (item size: 1) to 27 items.
+A level-1 auxiliary file: chapters/05_evaluation.aux
+Reallocating 'name_of_file' (item size: 1) to 21 items.
+A level-1 auxiliary file: chapters/07_spec.aux
+Reallocating 'name_of_file' (item size: 1) to 25 items.
+A level-1 auxiliary file: chapters/08_appendix.aux
+Reallocating 'name_of_file' (item size: 1) to 27 items.
+A level-1 auxiliary file: chapters/06_conclusion.aux
+Reallocating 'name_of_file' (item size: 1) to 9 items.
+The style file: IEEEtran.bst
+Reallocating 'name_of_file' (item size: 1) to 11 items.
+Reallocating 'singl_function' (item size: 4) to 100 items.
+Reallocating 'singl_function' (item size: 4) to 100 items.
+Reallocating 'singl_function' (item size: 4) to 100 items.
+Reallocating 'wiz_functions' (item size: 4) to 6000 items.
+Reallocating 'singl_function' (item size: 4) to 100 items.
+Database file #1: references.bib
+-- IEEEtran.bst version 1.14 (2015/08/26) by Michael Shell.
+-- http://www.michaelshell.org/tex/ieeetran/bibtex/
+-- See the "IEEEtran_bst_HOWTO.pdf" manual for usage information.
+
+Done.
+You've used 8 entries,
+            4087 wiz_defined-function locations,
+            879 strings with 8834 characters,
+and the built_in function-call counts, 5238 in all, are:
+= -- 423
+> -- 107
+< -- 34
++ -- 58
+- -- 20
+* -- 241
+:= -- 825
+add.period$ -- 18
+call.type$ -- 8
+change.case$ -- 8
+chr.to.int$ -- 72
+cite$ -- 8
+duplicate$ -- 392
+empty$ -- 445
+format.name$ -- 23
+if$ -- 1209
+int.to.chr$ -- 0
+int.to.str$ -- 8
+missing$ -- 69
+newline$ -- 47
+num.names$ -- 8
+pop$ -- 160
+preamble$ -- 1
+purify$ -- 0
+quote$ -- 2
+skip$ -- 416
+stack$ -- 0
+substring$ -- 191
+swap$ -- 296
+text.length$ -- 10
+text.prefix$ -- 0
+top$ -- 5
+type$ -- 8
+warning$ -- 0
+while$ -- 21
+width$ -- 9
+write$ -- 96

@@ -1,0 +1,91 @@
+\chapter{Algorithmic Implementation}
+\label{ch:algorithms}
+
+This chapter details the specific programmatic methodologies employed to implement the theoretical architecture discussed previously. The Mesh-LZ reference codec is written in Rust, leveraging its zero-cost abstractions, memory safety guarantees, and "fearless concurrency" paradigms to achieve near-C-level performance while preventing buffer overflows and race conditions.
+
+\section{1D Spatial Lempel-Ziv Parsing}
+
+The Lempel-Ziv matching phase iterates over the 1D stenciled pixel array for each $b \times b$ block. For each index $i$, the algorithm seeks the longest contiguous sequence of pixels starting at $i$ that perfectly matches a previously seen sequence in the block (acting as the sliding window dictionary).
+
+\begin{algorithm}[H]
+\SetAlgoLined
+\KwIn{Array of pixels $P$ of length $N = b^2$, minimum match length $M$}
+\KwOut{List of LZ Commands $C$}
+ $C \gets \text{empty list}$\;
+ $i \gets 0$\;
+ \While{$i < N$}{
+  $\text{best\_len} \gets 0$\;
+  $\text{best\_offset} \gets 0$\;
+  \For{$j \gets 0$ \KwTo $i - 1$}{
+   $L \gets 0$\;
+   \While{$i + L < N$ \textbf{and} $P[i+L] == P[j+L]$}{
+    $L \gets L + 1$\;
+   }
+   \If{$L > \text{best\_len}$}{
+    $\text{best\_len} \gets L$\;
+    $\text{best\_offset} \gets i - j$\;
+   }
+  }
+  \eIf{$\text{best\_len} \ge M$}{
+   $C.\text{append}(\text{Match(offset}=\text{best\_offset}, \text{length}=\text{best\_len}))$\;
+   $i \gets i + \text{best\_len}$\;
+  }{
+   $C.\text{append}(\text{Literal}(P[i]))$\;
+   $i \gets i + 1$\;
+  }
+ }
+ \Return{$C$}\;
+ \caption{Greedy Lempel-Ziv Block Matcher}
+\end{algorithm}
+
+The dictionary search space is strictly constrained to the bounds of the current $b \times b$ block. While this theoretically sacrifices some long-distance redundancy that a global, image-wide sliding window might capture, it restricts the maximum offset to $b^2 - 1$ (e.g., a maximum offset of $255$ for a $16 \times 16$ block). This allows both the \texttt{offset} and \texttt{length} variables to be encoded as tight 8-bit symbols, significantly reducing the required alphabet size for the entropy coder. Furthermore, it strictly isolates the blocks from one another, enabling multi-threaded decoding without inter-block data dependencies.
+
+\section{Interleaved rANS Entropy Coding}
+
+The output of the LZ parser is a stream of distinct symbols: Commands (\texttt{Literal} or \texttt{Match}), Quantized Residuals (Luma, Chroma\_U, Chroma\_V), Offsets, and Match Lengths. Attempting to encode these directly into a single rANS state creates a severe data dependency bottleneck during decoding.
+
+Mesh-LZ solves this by implementing \textbf{Interleaved rANS}. Rather than maintaining a single state $x$, the encoder maintains $N$ distinct states (in the reference implementation, $N=2$). During encoding, symbols are popped from the syntax streams in reverse order, and the encoder updates the states in a round-robin fashion.
+
+\begin{algorithm}[H]
+\SetAlgoLined
+\KwIn{List of symbols $S$, Frequency Tables $T$}
+\KwOut{Byte stream $B$}
+ $x_0 \gets \text{L\_LOWER\_BOUND}$\;
+ $x_1 \gets \text{L\_LOWER\_BOUND}$\;
+ $B \gets \text{empty list}$\;
+ $count \gets 0$\;
+ 
+ \For{$s \in \text{reverse}(S)$}{
+  $\text{idx} \gets count \pmod 2$\;
+  $table \gets T[\text{type of } s]$\;
+  \While{$x_{\text{idx}} \ge table.\text{max\_x}$}{
+   $B.\text{append}(x_{\text{idx}} \pmod{256})$\;
+   $x_{\text{idx}} \gets x_{\text{idx}} / 256$\;
+  }
+  $slot \gets table.\text{symbols}[s]$\;
+  $x_{\text{idx}} \gets (x_{\text{idx}} / slot.freq) \times table.scale + (x_{\text{idx}} \pmod{slot.freq}) + slot.start$\;
+  $count \gets count + 1$\;
+ }
+ \Return{Reverse($B$)}\;
+ \caption{Interleaved rANS Encoder}
+\end{algorithm}
+
+The true power of this implementation manifests during decoding. Modern superscalar CPUs can execute multiple independent arithmetic instructions per clock cycle. Because $x_0$ and $x_1$ have absolutely no data dependencies during the state update math, the CPU pipeline processes them entirely in parallel. This interleaving is the primary architectural feature responsible for Mesh-LZ's sub-5-millisecond decoding times on standard desktop hardware.
+
+\section{Rayon-Driven Parallelization and Multi-threading}
+
+The block-independent design of Mesh-LZ allows the Rust \texttt{rayon} library to seamlessly parallelize the workload using a work-stealing thread pool. The image is divided into row-strides (horizontal bands of blocks). 
+
+The variance analysis, stencil selection, and LZ parsing for all blocks in a row occur in total isolation on a single thread. In Rust, this is expressed elegantly via data parallelism iterators:
+
+\begin{verbatim}
+let row_data_vec: Vec<RowData> = (0..rows).into_par_iter().map(|by| {
+    // Process entire row of blocks in parallel
+    // Calculate variances, stencils, and greedy LZ matching
+    // Return compressed row data
+}).collect();
+\end{verbatim}
+
+By utilizing \texttt{.into\_par\_iter()}, Mesh-LZ achieves near-linear scaling across multi-core processors for the heavy lifting of the encoding phase. During the final bitstream serialization, the independently compressed row streams are concatenated sequentially, accompanied by 32-bit length headers. 
+
+These headers are vital for the decoder; they allow the decoding application to instantly jump to the start of any row's byte stream in memory, allocate a thread for that row, and begin decoding the rANS states in parallel without needing to wait for the previous row to finish decompressing. This ensures the decoder scales with core count just as efficiently as the encoder.

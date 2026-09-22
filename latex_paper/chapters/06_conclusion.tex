@@ -1,0 +1,23 @@
+\chapter{Conclusion and Future Work}
+\label{ch:conclusion}
+
+\section{Conclusion}
+
+This thesis has presented Mesh-LZ, an asymmetrical, highly efficient image compression format built upon the foundations of Lempel-Ziv dictionary matching and Asymmetric Numeral Systems. By fundamentally reimagining the parsing of 2D images, abandoning complex frequency-domain filters and serial context modeling in favor of heuristic-driven 1D spatial stencils, Mesh-LZ demonstrates that spatial correlation can be captured with exceptional fidelity while maintaining $O(1)$ block decoding dependencies.
+
+The benchmarking results validate the core hypothesis: Mesh-LZ achieves a robust lossless compression ratio (11.514 BPP), outperforming the venerable PNG format by over 25\%. Concurrently, its implementation of Interleaved rANS entropy coding and block-level independence allows the decoding process to achieve extreme velocity, executing in under 4 milliseconds on standard hardware, rendering it faster to decode than WebP, PNG, and JPEG XL.
+
+Furthermore, the integration of reversible YCoCg-R color decorrelation and 4:2:0 chroma subsampling extends Mesh-LZ firmly into the realm of lossy compression, offering a highly viable, visually transparent alternative for high-speed graphics and web asset delivery. While Mesh-LZ may not supplant JPEG or JPEG XL at the most aggressive quantization tiers (sub 2.0 BPP), it firmly establishes a new architectural paradigm for ultra-low-latency image decompression, proving that the synergy of classical dictionary techniques and modern entropy algorithms remains a fertile ground for innovation.
+
+\section{Future Work}
+
+Several avenues for optimization and algorithmic expansion remain open for future research on the Mesh-LZ architecture:
+
+\subsection{Machine Learning Stencil Selection}
+The current implementation utilizes a hard-coded gradient variance heuristic to select between three pre-defined stencils (Raster, Column, Hilbert). Replacing this heuristic with a lightweight, quantized neural network or a decision tree could allow the encoder to select the optimal 1D traversal path from a dictionary of thousands of dynamically generated space-filling curves, drastically improving the LZ dictionary hit rate.
+
+\subsection{Inter-block DC Prediction}
+Currently, blocks are entirely independent. Implementing a mechanism to predict the DC (average luma) value of a block based on its top and left neighbors would center the intra-block residual distribution much closer to zero. This would significantly lower the Shannon entropy of the residuals, improving rANS compression rates at the cost of introducing minor decoding dependencies.
+
+\subsection{Hardware SIMD Intrinsics}
+While the Interleaved rANS algorithm natively avoids CPU pipeline stalls, it is currently implemented in standard Rust iterative loops. Explicitly rewriting the Interleaved rANS decoder loop using AVX-512 (Advanced Vector Extensions) or ARM NEON vector intrinsics would allow the CPU to mathematically update 8 or 16 rANS states in a single clock cycle. Given the independent nature of the interleaved states, theoretical decoding times for 4K images could realistically be pushed below 1 millisecond.
